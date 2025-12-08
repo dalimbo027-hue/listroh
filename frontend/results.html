@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content="Listroh — a dedicated engine for structured list-based search.">
+    <title>Listroh — Results</title>
+    <link rel="stylesheet" href="results.css" />
+  </head>
+  <body>
+    <header class="site-header small">
+      <div class="brand">
+        <a href="index.html" class="logo small" id="logoTitle" rel="noopener" >Listroh</a>
+      </div>
+
+      <div class="search-wrap small">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search..."
+          aria-label="Search"
+        />
+        <button id="searchBtn" type="button">Search</button>
+      </div>
+
+      <div class="controls">
+        <button id="themeToggle" type="button" aria-label="Toggle theme">☀️</button>
+        <button id="clearCacheBtn" type="button" aria-label="Clear search cache">
+          🗑️ Clear Cache
+        </button>
+      </div>
+    </header>
+
+    <main class="results-root">
+
+      <button id="menuToggle" type="button" class="hamburger-global">☰
+        </button>
+
+        <div id="backdrop" aria-hidden="true"></div>
+
+      <aside class="left-panel" id="leftPanel" aria-label="List titles">
+        <div class="panel-inner" id="titlesContainer"></div>
+      </aside>
+
+      <section class="right-panel" id="rightPanel" aria-live="polite">
+        <div class="panel-inner" id="contentContainer">
+          <p class="placeholder">Select a list from the left to view items.</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="results.js"></script>
+  </body>
+</html>

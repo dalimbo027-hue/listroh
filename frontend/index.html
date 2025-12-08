@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Listroh — A dedicated search engine for lists. Discover movies, games, books, and structured data instantly.">
+  <meta name="keywords" content="list search, movies list, games list, books, structured search engine">
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="preload" href="path/to/font.woff2" as="font" type="font/woff2" crossorigin>
+  <title>Listroh — Search</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="controls">
+    <button id="themeToggle">☀️</button>
+  </div>
+
+  <div class="center-box">
+    <a href="index.html" class="logo big-logo">Listroh</a>
+    <p class="tag">search for lists — “A dedicated engine for structured discovery.”</p>
+
+    <div class="search-wrap">
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Search something... e.g. movies, games, books"
+      />
+      <button id="searchBtn">Search</button>
+    </div>
+
+    <p class="hint">
+      Try:
+      <button class="quick" data-q="movies">movies</button>
+      <button class="quick" data-q="games">games</button>
+      <button class="quick" data-q="books">books</button>
+    </p>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>
