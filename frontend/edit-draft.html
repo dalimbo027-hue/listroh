@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Edit Draft — Listroh</title>
+    <link rel="stylesheet" href="edit-draft.css" />
+  </head>
+
+  <body>
+    <header class="site-header small">
+      <div class="brand">
+        <a href="dashboard.html" class="logo small">Listroh</a>
+      </div>
+
+      <div class="controls">
+        <button id="themeToggle">☀️</button>
+        <button id="backBtn">⬅ Back</button>
+      </div>
+    </header>
+
+    <main class="edit-root">
+      <div class="edit-card">
+        <h2>Edit Draft List</h2>
+        <p class="muted">
+          This is a REGULAR list stored locally. Convert it to Top10 when ready.
+        </p>
+
+        <form id="draftForm" class="edit-form">
+          <label>Title</label>
+          <input id="draftTitle" type="text" required />
+
+          <label>Description</label>
+          <textarea id="draftDesc" placeholder="Optional description..."></textarea>
+
+          <label>Items</label>
+          <div id="itemsBox" class="items-box"></div>
+
+          <div class="row-actions">
+            <button type="button" id="addItemBtn">➕ Add Item</button>
+            <button type="button" id="removeItemBtn">➖ Remove Last</button>
+          </div>
+
+          <div class="actions">
+            <button type="submit" id="saveBtn">💾 Save Draft</button>
+            <button type="button" id="convertBtn">⭐ Convert to Top10</button>
+            <button type="button" id="deleteBtn">🗑 Delete Draft</button>
+          </div>
+
+          <p class="status-line">
+            Draft ID: <span id="draftIdText"></span>
+          </p>
+        </form>
+      </div>
+    </main>
+
+    <script type="module" src="edit-draft.js"></script>
+  </body>
+</html>

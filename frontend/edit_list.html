@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Edit List — Listroh</title>
+    <link rel="stylesheet" href="edit-list.css" />
+  </head>
+
+  <body>
+    <!-- Sticky header consistent with dashboard/results -->
+    <header class="site-header small">
+      <div class="brand">
+        <a href="dashboard.html" class="logo small">Listroh</a>
+      </div>
+
+      <div class="controls">
+        <button id="themeToggle">☀️</button>
+        <button id="backBtn">⬅ Back</button>
+      </div>
+    </header>
+
+    <main class="edit-root">
+      <div class="edit-card">
+        <h2>Edit Top 10 List</h2>
+
+        <p class="muted" id="statusText">Loading...</p>
+
+        <!-- rejection reason box (only shown if rejected) -->
+        <div id="rejectBox" class="reject-box" style="display:none;">
+          <h3>❌ Rejected</h3>
+          <p id="rejectReason"></p>
+        </div>
+
+        <form id="editForm" class="edit-form">
+          <label>Title</label>
+          <input id="listTitle" type="text" required />
+
+          <label>Description</label>
+          <textarea id="listDesc" placeholder="Optional description..."></textarea>
+
+          <label>Top 10 Items</label>
+          <div id="itemsBox" class="items-box"></div>
+
+          <div class="actions">
+            <button type="submit" id="saveBtn">💾 Save</button>
+            <button type="button" id="submitBtn">📨 Submit Review</button>
+            <button type="button" id="deleteBtn">🗑 Delete</button>
+          </div>
+
+          <p class="status-line">
+            List ID: <span id="listIdText"></span>
+          </p>
+        </form>
+      </div>
+    </main>
+
+    <script type="module" src="edit-list.js"></script>
+  </body>
+</html>

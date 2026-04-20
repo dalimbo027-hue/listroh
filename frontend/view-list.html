@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>View List — Listroh</title>
+  <link rel="stylesheet" href="results.css" />
+</head>
+<body>
+
+  <!-- ── Header — identical structure to results.html ── -->
+  <header class="site-header small">
+    <div class="brand">
+      <a href="index.html" class="logo small" id="logoHome">Listroh</a>
+    </div>
+
+    <div class="search-wrap small">
+      <input id="searchInput" type="search" placeholder="Search..." aria-label="Search" />
+      <button id="searchBtn" type="button">Search</button>
+    </div>
+
+    <div class="controls">
+      <a href="explore.html"
+        style="padding:8px 12px;border-radius:10px;border:1px solid var(--panel-border);
+               background:var(--panel);color:var(--text);text-decoration:none;font-weight:700;font-size:0.9rem;">
+        🌐 Explore
+      </a>
+      <button id="backDashboardBtn" style="display:none;">← Dashboard</button>
+      <button id="themeToggle" type="button" aria-label="Toggle theme">☀️</button>
+    </div>
+  </header>
+
+  <!-- ── Same results-root layout ── -->
+  <main class="results-root">
+
+    <!-- Mobile hamburger -->
+    <button id="menuToggle" type="button" class="hamburger-global">☰</button>
+    <div id="backdrop" aria-hidden="true"></div>
+
+    <!-- Left panel — list metadata + item index -->
+    <aside class="left-panel" id="leftPanel" aria-label="List info">
+      <div class="panel-inner" id="leftContainer">
+        <p class="placeholder">Loading…</p>
+      </div>
+    </aside>
+
+    <!-- Right panel — ranked items -->
+    <section class="right-panel" id="rightPanel" aria-live="polite">
+      <div class="panel-inner" id="rightContainer">
+        <p class="placeholder">Loading…</p>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="view-list.js"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="description" content="Listroh — Browse published Top 10 lists from the community." />
+  <title>Explore — Listroh</title>
+  <link rel="stylesheet" href="results.css" />
+  <link rel="stylesheet" href="explore.css" />
+</head>
+<body>
+  <header class="site-header small">
+    <div class="brand">
+      <a href="index.html" class="logo small">Listroh</a>
+    </div>
+
+    <div class="search-wrap small">
+      <input id="exploreSearch" type="search" placeholder="Filter lists..." />
+      <button id="exploreSearchBtn">Search</button>
+    </div>
+
+    <div class="controls">
+      <button id="themeToggle" type="button">☀️</button>
+      <button id="authBtn" type="button">Login</button>
+    </div>
+  </header>
+
+  <main class="explore-root">
+    <div class="explore-header">
+      <h1>Explore Lists</h1>
+      <p class="muted">Community-published Top 10 lists</p>
+
+      <div class="sort-row">
+        <span class="sort-label">Sort by:</span>
+        <button class="sort-btn active" data-sort="newest">Newest</button>
+        <button class="sort-btn" data-sort="oldest">Oldest</button>
+      </div>
+    </div>
+
+    <div id="listsGrid" class="lists-grid">
+      <p class="placeholder">Loading...</p>
+    </div>
+
+    <div id="loadMoreWrap" style="text-align:center;margin-top:24px;display:none;">
+      <button id="loadMoreBtn" class="load-more-btn">Load more</button>
+    </div>
+  </main>
+
+  <script type="module" src="explore.js"></script>
+</body>
+</html>

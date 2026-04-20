@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Convert Draft → Top10</title>
+    <link rel="stylesheet" href="convert_top10.css" />
+  </head>
+
+  <body>
+    <header class="site-header small">
+      <div class="brand">
+        <a href="dashboard.html" class="logo small">Listroh</a>
+      </div>
+
+      <div class="controls">
+        <button id="themeToggle">☀️</button>
+        <button id="backBtn">⬅ Back</button>
+      </div>
+    </header>
+
+    <main class="convert-root">
+      <div class="convert-card">
+        <h2>Convert Draft to Top 10</h2>
+
+        <p class="muted">
+          Select 10 items from your REGULAR draft list. Drag to reorder ranking.
+        </p>
+
+        <h3 id="draftTitle">Loading...</h3>
+        <p id="draftDesc" class="muted"></p>
+
+        <div class="grid">
+          <div>
+            <h3>Draft Items</h3>
+            <div id="draftItemsBox" class="draft-items"></div>
+          </div>
+
+          <div>
+            <h3>Selected Top 10 (Drag to reorder)</h3>
+            <ol id="selectedList" class="sortable"></ol>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="submitPrivateBtn">💾 Save Private</button>
+          <button id="submitPendingBtn">📨 Submit Review</button>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="convert_top10.js"></script>
+  </body>
+</html>

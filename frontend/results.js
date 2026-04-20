@@ -1,47 +1,23 @@
-// results.js — adaptive to multi-source backend (v3)
+// results.js
+import { getSupabase } from "./supabase.js";
+
 const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
-// ---------- DOM references ----------
-const urlParams = new URLSearchParams(window.location.search);
-const query = urlParams.get("q");
-
+// ---------- DOM ----------
+const urlParams       = new URLSearchParams(window.location.search);
+const query           = urlParams.get("q");
 const titlesContainer = document.getElementById("titlesContainer");
-const contentContainer = document.getElementById("contentContainer");
-const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
-const themeBtn = document.getElementById("themeToggle");
-const clearCacheBtn = document.getElementById("clearCacheBtn");
+const contentContainer= document.getElementById("contentContainer");
+const searchInput     = document.getElementById("searchInput");
+const searchBtn       = document.getElementById("searchBtn");
+const themeBtn        = document.getElementById("themeToggle");
+const clearCacheBtn   = document.getElementById("clearCacheBtn");
+const menuToggle      = document.getElementById("menuToggle");
+const leftPanel       = document.querySelector(".left-panel");
+const backdrop        = document.getElementById("backdrop");
+const backBtn         = document.getElementById("backDashboardBtn");
 
-const menuToggle = document.getElementById("menuToggle");
-const leftPanel = document.querySelector(".left-panel");
-const backdrop = document.getElementById("backdrop");
-
-menuToggle.addEventListener("click", () => {
-  const isOpen = leftPanel.classList.toggle("open");
-
-  if (isOpen) {
-    menuToggle.classList.add("shifted");
-    backdrop.classList.add("visible");
-  } else {
-    menuToggle.classList.remove("shifted");
-    backdrop.classList.remove("visible");
-  }
-});
-
-/* Close on backdrop click */
-backdrop.addEventListener("click", () => {
-  leftPanel.classList.remove("open");
-  menuToggle.classList.remove("shifted");
-  backdrop.classList.remove("visible");
-});;
-
-document.getElementById("titlesContainer").addEventListener("click", () => {
-  leftPanel.classList.remove("open");
-  menuToggle.classList.remove("shifted");
-  backdrop.classList.remove("visible");
-});
-
-
+// ---------- Header height (fixes mobile hamburger position) ----------
 function updateHeaderHeight() {
   const header = document.querySelector(".site-header");
   if (header) {
@@ -51,291 +27,271 @@ function updateHeaderHeight() {
     );
   }
 }
+updateHeaderHeight();
+window.addEventListener("resize", updateHeaderHeight);
 
-// ---------- Theme Handling ----------
-const root = document.documentElement;
-const stored = localStorage.getItem("listem_theme");
+// ---------- Auth — show Dashboard button if logged in ----------
+const supabase = await getSupabase();
 
-if (stored) root.setAttribute("data-theme", stored);
-if (!stored) {
-  root.setAttribute("data-theme", "dark");
-  localStorage.setItem("listem_theme", "dark");
-}
-function updateThemeIcon() {
-  themeBtn.textContent =
-    root.getAttribute("data-theme") === "dark" ? "☀️" : "🌑";
-}
-updateThemeIcon();
+(async () => {
+  const { data } = await supabase.auth.getSession();
+  if (data?.session) {
+    backBtn.style.display = "inline-block";
+    backBtn.onclick = () => { window.location.href = "dashboard.html"; };
+  }
+})();
 
-themeBtn.addEventListener("click", () => {
-  const current = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  root.setAttribute("data-theme", current);
-  localStorage.setItem("listem_theme", current);
-  updateThemeIcon();
+// ---------- Mobile drawer ----------
+menuToggle.addEventListener("click", () => {
+  const isOpen = leftPanel.classList.toggle("open");
+  menuToggle.classList.toggle("shifted", isOpen);
+  backdrop.classList.toggle("visible", isOpen);
 });
 
-// ---------- Home ----------
+backdrop.addEventListener("click", closeDrawer);
+titlesContainer.addEventListener("click", closeDrawer);
+
+function closeDrawer() {
+  leftPanel.classList.remove("open");
+  menuToggle.classList.remove("shifted");
+  backdrop.classList.remove("visible");
+}
+
+// ---------- Theme ----------
+const root = document.documentElement;
+const storedTheme = localStorage.getItem("listem_theme") || "dark";
+root.setAttribute("data-theme", storedTheme);
+
+function syncTheme() {
+  themeBtn.textContent = root.getAttribute("data-theme") === "dark" ? "☀️" : "🌑";
+}
+syncTheme();
+
+themeBtn.addEventListener("click", () => {
+  const next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  root.setAttribute("data-theme", next);
+  localStorage.setItem("listem_theme", next);
+  syncTheme();
+});
+
+// ---------- Logo click ----------
 document.getElementById("logoTitle")?.addEventListener("click", () => {
   window.location.href = "index.html";
 });
 
-// ---------- Clear Cache ----------
+// ---------- Clear cache ----------
 clearCacheBtn?.addEventListener("click", () => {
-  Object.keys(localStorage).forEach((key) => {
-    if (key.startsWith("searchCache:")) localStorage.removeItem(key);
-  });
-  alert("Cache cleared!");
+  Object.keys(localStorage)
+    .filter(k => k.startsWith("searchCache:"))
+    .forEach(k => localStorage.removeItem(k));
+  clearCacheBtn.textContent = "✓ Cleared";
+  setTimeout(() => { clearCacheBtn.textContent = "🗑️ Clear Cache"; }, 1500);
 });
 
-// ---------- Cache ----------
-function getCachedQuery(q) {
-  try {
-    const cache = JSON.parse(localStorage.getItem(`searchCache:${q}`));
-    if (!cache) return null;
-    if (Date.now() - cache.timestamp > CACHE_TTL_MS) {
-      localStorage.removeItem(`searchCache:${q}`);
-      return null;
-    }
-    return cache.data;
-  } catch {
-    return null;
-  }
-}
-function setCachedQuery(q, data) {
-  localStorage.setItem(
-    `searchCache:${q}`,
-    JSON.stringify({ timestamp: Date.now(), data })
-  );
-}
-
-// ---------- Search ----------
+// ---------- Search bar ----------
 searchInput.value = query || "";
+
 function triggerSearch() {
   const q = searchInput.value.trim();
   if (!q) return;
   window.location.href = `results.html?q=${encodeURIComponent(q)}`;
 }
 searchBtn.addEventListener("click", triggerSearch);
-searchInput.addEventListener("keydown", (e) => {
+searchInput.addEventListener("keydown", e => {
   if (e.key === "Enter") triggerSearch();
 });
 
-// ---------- Fetch Results ----------
-async function fetchAndRenderResults(q) {
-  titlesContainer.innerHTML = `<p class="placeholder fade-in">Loading sections...</p>`;
-  contentContainer.innerHTML = `<p class="placeholder fade-in">Loading results...</p>`;
+// ---------- Client-side cache ----------
+function getCached(q) {
+  try {
+    const raw = localStorage.getItem(`searchCache:${q}`);
+    if (!raw) return null;
+    const entry = JSON.parse(raw);
+    if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+      localStorage.removeItem(`searchCache:${q}`);
+      return null;
+    }
+    return entry.data;
+  } catch {
+    return null;
+  }
+}
 
-  const cached = getCachedQuery(q);
-  if (cached) return renderResults(cached);
+function setCache(q, data) {
+  try {
+    localStorage.setItem(`searchCache:${q}`, JSON.stringify({ timestamp: Date.now(), data }));
+  } catch {
+    // localStorage full — silently skip caching
+  }
+}
+
+// ---------- Safe text helper (prevents XSS from API item names) ----------
+function safeText(str) {
+  const d = document.createElement("div");
+  d.textContent = str ?? "";
+  return d.innerHTML;
+}
+
+// ---------- Fetch ----------
+async function fetchAndRender(q) {
+  titlesContainer.innerHTML = `<p class="placeholder fade-in">Loading…</p>`;
+  contentContainer.innerHTML = `<p class="placeholder fade-in">Fetching results…</p>`;
+
+  const cached = getCached(q);
+  if (cached) {
+    renderResults(cached);
+    return;
+  }
 
   try {
     const res = await fetch(`/search?q=${encodeURIComponent(q)}`);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `HTTP ${res.status}`);
+    }
+
     const data = await res.json();
 
     if (!data?.items?.length) {
       titlesContainer.innerHTML = "";
-      contentContainer.innerHTML = `<p class="placeholder fade-in">No results found for "${q}".</p>`;
+      contentContainer.innerHTML = `
+        <div style="text-align:center;padding:60px 20px;">
+          <p style="font-size:2rem;">🔍</p>
+          <p class="placeholder">No results found for "<strong>${safeText(q)}</strong>".</p>
+          <p class="placeholder" style="font-size:0.88rem;">Try a different search term.</p>
+        </div>`;
       return;
     }
 
-    setCachedQuery(q, data);
+    setCache(q, data);
     renderResults(data);
+
   } catch (err) {
-    console.error("Fetch failed:", err);
+    console.error("Search failed:", err);
     titlesContainer.innerHTML = "";
-    contentContainer.innerHTML = `<p class="placeholder fade-in">⚠️ Unable to connect. Try again later.</p>`;
+    contentContainer.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;">
+        <p style="font-size:2rem;">⚠️</p>
+        <p class="placeholder">${safeText(err.message)}</p>
+        <button onclick="fetchAndRender(${JSON.stringify(q)})"
+          style="margin-top:12px;padding:10px 20px;border-radius:10px;border:none;
+                 background:var(--accent-2);color:#fff;cursor:pointer;font-weight:700;">
+          Retry
+        </button>
+      </div>`;
   }
 }
+
 // ---------- Render ----------
-async function renderResults(data) {
+function renderResults(data) {
   titlesContainer.innerHTML = "";
   contentContainer.innerHTML = "";
 
-  const sections = (data.items || data.results || []).map((section) => ({
-    title: section.title || section.query || "Untitled Section",
+  const sections = (data.items || []).map(section => ({
+    title:  section.title  || "Untitled",
     source: section.source || "Unknown",
-    items:
-      section.items || section.results || section.data || section.list || [],
+    items:  section.items  || [],
   }));
 
-  function flattenItems(items) {
-    const result = [];
-    items.forEach((item) => {
-      if (item.items && Array.isArray(item.items)) {
-        result.push({
-          isHeader: true,
-          title: item.title || item.name || "Untitled Subsection",
-          children: flattenItems(item.items),
-        });
-      } else {
-        result.push({
-          isHeader: false,
-          title: item.name || item.title || "Untitled",
-          link: item.link || item.url || null,
-        });
-      }
-    });
-    return result;
+  if (!sections.length) {
+    contentContainer.innerHTML = `<p class="placeholder">No results to display.</p>`;
+    return;
   }
 
   sections.forEach((section, index) => {
-    const titleCard = document.createElement("div");
-    titleCard.className = "title-card";
-    titleCard.innerHTML = `
-      <div class="t">${section.title}</div>
-      <div class="sub">${section.source}</div>
-    `;
+    // ── Left panel title card ──
+    const card = document.createElement("div");
+    card.className = "title-card";
 
-    titleCard.addEventListener("click", () => {
-      document
-        .querySelectorAll(".title-card")
-        .forEach((el) => el.classList.remove("active"));
-      titleCard.classList.add("active");
+    const t   = document.createElement("div");
+    t.className = "t";
+    t.textContent = section.title;
 
-      const flattened = flattenItems(section.items);
+    const sub = document.createElement("div");
+    sub.className = "sub";
+    sub.textContent = section.source;
 
-      const listHTML = flattened
-        .map((item, i) => {
-          if (item.isHeader) {
-            const uid = "sub-" + Math.random().toString(36).substr(2, 6);
-            return `
-              <li class="subheader" data-uid="${uid}">
-                <div class="subheader-title">${item.title}</div>
-                <ul class="sub-items" id="${uid}">
-                  ${item.children
-                    .map(
-                      (sub, j) => `
-                        <li>
-                          <div class="rank">${j + 1}</div>
-                          <div class="txt">
-                            <div class="result-name">${sub.title}</div>
-                            ${
-                              sub.link
-                                ? `<a href="${sub.link}" target="_blank" class="result-link">🔗 View Source</a>`
-                                : ""
-                            }
-                          </div>
-                        </li>`
-                    )
-                    .join("")}
-                </ul>
-              </li>`;
-          } else {
-            return `
-              <li>
-                <div class="rank">${i + 1}</div>
-                <div class="txt">
-                  <div class="result-name">${item.title}</div>
-                  ${
-                    item.link
-                      ? `<a href="${item.link}" target="_blank" class="result-link">🔗 View Source</a>`
-                      : ""
-                  }
-                </div>
-              </li>`;
-          }
-        })
-        .join("");
+    card.append(t, sub);
+    titlesContainer.appendChild(card);
 
-      contentContainer.innerHTML = `
-        <div class="list-panel fade-in">
-          <h3 class="list-title">${section.title}</h3>
-          <ul class="items">${listHTML}</ul>
-          <p class="source-note">Source: ${section.source}</p>
-        </div>
-      `;
-
-      document.querySelectorAll(".subheader-title").forEach((header) => {
-        header.addEventListener("click", () => {
-          const uid = header.parentElement.getAttribute("data-uid");
-          const subList = document.getElementById(uid);
-          header.classList.toggle("open");
-          subList.classList.toggle("collapsed");
-        });
-      });
-
-      if (window.innerWidth <= 768) titlesContainer.classList.add("hide");
+    // ── Click → render items in right panel ──
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".title-card").forEach(c => c.classList.remove("active"));
+      card.classList.add("active");
+      renderSection(section);
+      if (window.innerWidth <= 768) closeDrawer();
     });
 
-    titlesContainer.appendChild(titleCard);
-    if (index === 0) titleCard.click();
+    // Auto-click first result
+    if (index === 0) card.click();
   });
 }
 
-// ---------- Mobile ----------
-window.addEventListener("resize", () => {
-  if (window.innerWidth > 768) titlesContainer.classList.remove("hide");
-});
-document.getElementById("mobileBack")?.addEventListener("click", () => {
-  titlesContainer.classList.remove("hide");
-});
+function renderSection(section) {
+  // Build list panel
+  const panel = document.createElement("div");
+  panel.className = "list-panel fade-in";
 
-// ---------- Initial ----------
-if (query) fetchAndRenderResults(query);
-else
-  contentContainer.innerHTML = `<p class="placeholder fade-in">Type something in the search box above to begin.</p>`;
-// ---------- Enhanced Right Panel Rendering ----------
-// ---------- Enhanced Right Panel Rendering (fixed display) ----------
-async function performSearch(query) {
+  const titleEl = document.createElement("h3");
+  titleEl.className = "list-title";
+  titleEl.textContent = section.title;
+  panel.appendChild(titleEl);
 
-  try {
-    const response = await fetch(`/search?q=${encodeURIComponent(query)}`);
-    const data = await response.json();
-    const rightSide = document.getElementById("rightResults");
-    rightSide.innerHTML = ""; // Clear before rendering
+  const ul = document.createElement("ul");
+  ul.className = "items";
 
-    // Safety checks
-    if (!data || !data.items || !data.items.length) {
-      rightSide.innerHTML = `<p>No results found.</p>`;
-      return;
+  section.items.forEach((item, i) => {
+    const li = document.createElement("li");
+
+    // Rank badge
+    const rank = document.createElement("div");
+    rank.className = "rank";
+    rank.textContent = i + 1;
+
+    // Text block
+    const txt = document.createElement("div");
+    txt.className = "txt";
+
+    const name = document.createElement("div");
+    name.className = "result-name";
+    name.textContent = item.name || item.title || "Untitled"; // textContent = safe
+
+    txt.appendChild(name);
+
+    if (item.link) {
+      const a = document.createElement("a");
+      a.href   = item.link;
+      a.target = "_blank";
+      a.rel    = "noopener noreferrer";
+      a.className = "result-link";
+      a.textContent = "🔗 View Source";
+      txt.appendChild(a);
     }
 
-    // Render each section of results
-    data.items.forEach((block) => {
+    li.append(rank, txt);
+    ul.appendChild(li);
+  });
 
-      const section = document.createElement("div");
-      section.className = "result-section fade-in";
+  panel.appendChild(ul);
 
-      // Section Title
-      const header = document.createElement("h3");
-      header.className = "result-section-title";
-      header.textContent = block.title || block.source || "Results";
-      section.appendChild(header);
+  // Source attribution
+  const sourceNote = document.createElement("p");
+  sourceNote.className = "source-note";
+  sourceNote.textContent = `Source: ${section.source}`;
+  panel.appendChild(sourceNote);
 
-      // Items List
-      const list = document.createElement("ul");
-      list.className = "result-list";
+  contentContainer.innerHTML = "";
+  contentContainer.appendChild(panel);
+}
 
-      block.items.forEach((item, index) => {
-        const li = document.createElement("li");
-        li.className = "result-item";
-
-        // If link exists → wrap name in <a>, else just text
-        if (item.link) {
-          const link = document.createElement("a");
-          link.href = item.link;
-          link.target = "_blank";
-          link.className = "result-name-link";
-          link.textContent = item.name || item.title || `Item ${index + 1}`;
-          li.appendChild(link);
-        } else {
-          const span = document.createElement("span");
-          span.className = "result-name";
-          span.textContent = item.name || item.title || `Item ${index + 1}`;
-          li.appendChild(span);
-        }
-
-        list.appendChild(li);
-      });
-
-      section.appendChild(list);
-      rightSide.appendChild(section);
-    });
-  } catch (err) {
-    console.error("❌ Error fetching search results:", err);
-    document.getElementById(
-      "rightResults"
-    ).innerHTML = `<p>Error loading results.</p>`;
-  }
+// ---------- Boot ----------
+if (query) {
+  fetchAndRender(query);
+} else {
+  contentContainer.innerHTML = `
+    <div style="text-align:center;padding:80px 20px;">
+      <p style="font-size:2rem;">🔍</p>
+      <p class="placeholder">Type something in the search box above to begin.</p>
+    </div>`;
 }

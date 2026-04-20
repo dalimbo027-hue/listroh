@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Listroh — Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+
+  <body>
+    <header class="site-header small">
+      <div class="brand">
+        <a href="index.html" class="logo small">Listroh</a>
+      </div>
+
+      <div class="search-wrap small">
+        <input id="searchInput" type="search" placeholder="Search..." />
+        <button id="searchBtn">Search</button>
+      </div>
+
+      <div class="controls">
+        <a href="explore.html" class="ctrl-link">🌐 Explore</a>
+        <button id="adminHeaderBtn" style="display:none;" class="ctrl-admin">🛡️ Admin</button>
+        <button id="themeToggle">☀️</button>
+        <button id="logoutBtn">Logout</button>
+      </div>
+    </header>
+
+    <main class="dash-root">
+      <aside class="dash-tabs">
+        <button class="tab-btn active" data-tab="createTab">➕ Create</button>
+        <button class="tab-btn" data-tab="myListsTab">📂 My Lists</button>
+        <button class="tab-btn" data-tab="profileTab">👤 Profile</button>
+        <button class="tab-btn admin-only" data-tab="adminTab" id="adminTabBtn"
+          style="display:none;background:rgba(255,80,80,0.12);border-color:rgba(255,80,80,0.3);color:#ff8080;">
+          🛡️ Admin
+        </button>
+      </aside>
+
+      <section class="dash-content">
+
+        <!-- CREATE TAB -->
+        <div class="tab-content active" id="createTab">
+          <h2>Create List</h2>
+          <form id="createListForm" class="form-card">
+            <input id="listTitle" type="text" placeholder="List title..." required />
+            <textarea id="listDesc" placeholder="Optional description..."></textarea>
+
+            <label style="color:var(--muted);font-weight:700;">List Type</label>
+            <select id="listTypeSelect">
+              <option value="TOP10">Top 10 List</option>
+              <option value="REGULAR">Regular List (Draft)</option>
+            </select>
+
+            <div id="createTop10Box" class="items-box"></div>
+
+            <div id="createRegularBox" style="display:none;">
+              <div class="regular-add">
+                <input id="regularItemInput" type="text" placeholder="Add item..." />
+                <button type="button" id="regularAddBtn">➕ Add</button>
+              </div>
+              <div id="regularItemsList" class="regular-items"></div>
+            </div>
+
+            <div class="action-row">
+              <button type="submit">💾 Save</button>
+              <button type="button" id="submitPendingBtn">📨 Submit Review</button>
+            </div>
+            <p id="createStatus" style="margin:4px 0 0;font-size:0.88rem;min-height:1.2em;"></p>
+          </form>
+        </div>
+
+        <!-- MY LISTS TAB -->
+        <div class="tab-content" id="myListsTab">
+          <h2>My Lists</h2>
+          <div id="myListsContainer"></div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div class="tab-content" id="profileTab">
+          <h2>Profile</h2>
+          <div id="profileBox"></div>
+        </div>
+
+        <!-- ADMIN TAB -->
+        <div class="tab-content" id="adminTab">
+          <div class="admin-topbar">
+            <h2 style="margin:0;color:#ff8080;">🛡️ Admin Panel</h2>
+            <div style="display:flex;gap:10px;align-items:center;">
+              <label style="color:var(--muted);font-size:0.9rem;">Sort by</label>
+              <select id="adminSort" class="admin-select">
+                <option value="created_at">Newest</option>
+                <option value="updated_at">Last updated</option>
+              </select>
+            </div>
+          </div>
+
+          <nav class="admin-tabs">
+            <button class="admin-tab-btn active" data-admin-tab="adminPending">
+              Pending <span class="admin-count" id="count-pending">0</span>
+            </button>
+            <button class="admin-tab-btn" data-admin-tab="adminPublished">
+              Published <span class="admin-count" id="count-published">0</span>
+            </button>
+            <button class="admin-tab-btn" data-admin-tab="adminRejected">
+              Rejected <span class="admin-count" id="count-rejected">0</span>
+            </button>
+          </nav>
+
+          <div id="adminPending"   class="admin-list-container"></div>
+          <div id="adminPublished" class="admin-list-container" style="display:none;"></div>
+          <div id="adminRejected"  class="admin-list-container" style="display:none;"></div>
+
+          <div class="admin-pagination">
+            <button id="adminPrevPage">← Prev</button>
+            <span id="adminPageInfo" style="color:var(--muted);font-size:0.9rem;"></span>
+            <button id="adminNextPage">Next →</button>
+          </div>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- ADMIN EDIT MODAL -->
+    <div id="adminEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:20px;">
+      <div class="admin-modal-card">
+        <h3 style="margin:0 0 14px;color:var(--accent);">Edit List</h3>
+        <input id="adminEditTitle" type="text" placeholder="Title" />
+        <textarea id="adminEditDesc" placeholder="Description..." style="min-height:70px;resize:vertical;"></textarea>
+        <div id="adminEditItems" class="admin-items-editor"></div>
+        <button id="adminAddItem" style="background:var(--glass);border:1px solid var(--panel-border);color:var(--text);border-radius:10px;padding:8px 12px;cursor:pointer;margin-top:4px;">+ Add item</button>
+        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;flex-wrap:wrap;">
+          <button id="adminSaveDraft">💾 Save only</button>
+          <button id="adminSaveApprove" style="background:var(--accent);color:#001;">✅ Save & Approve</button>
+          <button id="adminCancelEdit" style="background:rgba(255,80,80,0.2);color:#ff8080;">Cancel</button>
+        </div>
+        <p id="adminModalStatus" style="margin-top:8px;font-size:0.9rem;min-height:1em;color:var(--muted);"></p>
+      </div>
+    </div>
+
+    <!-- REJECT MODAL -->
+    <div id="adminRejectModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:20px;">
+      <div class="admin-modal-card">
+        <h3 style="margin:0 0 10px;color:#ff8080;">Reject List</h3>
+        <p style="color:var(--muted);font-size:0.9rem;margin:0 0 10px;">The user will see this reason.</p>
+        <textarea id="rejectReasonInput" placeholder="Reason for rejection..." style="min-height:80px;resize:vertical;"></textarea>
+        <div style="display:flex;gap:10px;margin-top:12px;justify-content:flex-end;">
+          <button id="confirmReject" style="background:rgba(255,80,80,0.85);color:#fff;">Reject</button>
+          <button id="cancelReject">Cancel</button>
+        </div>
+        <p id="rejectModalStatus" style="margin-top:8px;font-size:0.9rem;min-height:1em;color:var(--muted);"></p>
+      </div>
+    </div>
+
+    <script type="module" src="dashboard.js"></script>
+  </body>
+</html>

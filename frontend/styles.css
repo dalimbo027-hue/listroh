@@ -152,3 +152,154 @@ body {
   .search-wrap input { padding: 10px; }
   .search-wrap button { padding: 10px; }
 }
+
+/* Auth overlay */
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 20;
+}
+
+/* Slide panel */
+.auth-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+
+  width: 45vw;            /* 🔥 45% of screen */
+  max-width: 520px;       /* cap it so it never feels huge */
+  min-width: 360px;       /* avoids tiny panels on large screens */
+  height: 100vh;
+
+  background: var(--panel);
+  box-shadow: -20px 0 40px rgba(0,0,0,0.4);
+
+  transform: translateX(100%);
+  transition: transform 0.4s ease;
+  z-index: 21;
+
+  /* 🔥 CENTER CONTENT */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.auth-inner {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+/* Open state */
+.auth-panel.open {
+  transform: translateX(0);
+}
+.auth-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Auth content */
+.auth-panel h2 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: none;
+  background: var(--glass);
+  color: var(--text);
+  outline: none;
+}
+
+.auth-form input:focus {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.auth-primary {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-switch {
+  margin-top: auto;
+  color: var(--muted);
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+}
+
+/* Close button */
+.auth-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-size: 1.6rem;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+}
+.auth-status {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-top: -10px;
+}
+
+/* ── Site footer (Terms / Privacy links) ── */
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  background: transparent;
+  pointer-events: none; /* let clicks pass through to bg, links still work */
+}
+
+.site-footer a {
+  color: var(--muted);
+  text-decoration: none;
+  pointer-events: all;
+  transition: color 0.2s ease;
+}
+
+.site-footer a:hover {
+  color: var(--accent);
+}
+
+.footer-sep {
+  opacity: 0.4;
+}

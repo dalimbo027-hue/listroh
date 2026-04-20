@@ -1,42 +1,99 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <meta name="description" content="Listroh — A dedicated search engine for lists. Discover movies, games, books, and structured data instantly.">
-  <meta name="keywords" content="list search, movies list, games list, books, structured search engine">
-  <link rel="icon" href="/favicon.ico" />
-  <link rel="preload" href="path/to/font.woff2" as="font" type="font/woff2" crossorigin>
-  <title>Listroh — Search</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-
-  <div class="controls">
-    <button id="themeToggle">☀️</button>
-  </div>
-
-  <div class="center-box">
-    <a href="index.html" class="logo big-logo">Listroh</a>
-    <p class="tag">search for lists — “A dedicated engine for structured discovery.”</p>
-
-    <div class="search-wrap">
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="Search something... e.g. movies, games, books"
-      />
-      <button id="searchBtn">Search</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Listroh — A dedicated search engine for lists. Discover movies, games, books, and structured data instantly."
+    />
+    <meta
+      name="keywords"
+      content="list search, movies list, games list, books, structured search engine"
+    />
+    <link rel="icon" href="/favicon.ico" />
+    <title>Listroh — Search</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+  </head>
+  <body>
+    <div class="controls">
+      <a href="explore.html" style="padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);color:var(--text);text-decoration:none;font-weight:700;font-size:0.88rem;">🌐 Explore</a>
+      <button id="themeToggle">☀️</button>
+      <button id="authOpen">Login</button>
     </div>
 
-    <p class="hint">
-      Try:
-      <button class="quick" data-q="movies">movies</button>
-      <button class="quick" data-q="games">games</button>
-      <button class="quick" data-q="books">books</button>
-    </p>
-  </div>
+    <div class="center-box">
+      <a href="index.html" class="logo big-logo">Listroh</a>
+      <p class="tag">
+        search for lists — “A dedicated engine for structured discovery.”
+      </p>
 
-  <script src="index.js"></script>
-</body>
+      <div class="search-wrap">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search something... e.g. movies, games, books"
+        />
+        <button id="searchBtn">Search</button>
+      </div>
+
+      <p class="hint">
+        Try:
+        <button class="quick" data-q="movies">movies</button>
+        <button class="quick" data-q="games">games</button>
+        <button class="quick" data-q="books">books</button>
+      </p>
+    </div>
+
+    <!-- Auth Slide -->
+    <div class="auth-overlay" id="authOverlay"></div>
+
+    <div class="auth-panel" id="authPanel">
+      <button class="auth-close" id="authClose">×</button>
+
+      <div class="auth-inner">
+        <h2 id="authTitle">Welcome back</h2>
+
+        <form class="auth-form" id="authForm">
+          <input id="authEmail" type="email" placeholder="Email" required />
+          <input
+            id="authPassword"
+            type="password"
+            placeholder="Password"
+            required
+          />
+          <button type="submit" class="auth-primary" id="authPrimaryBtn">
+            Login
+          </button>
+        </form>
+
+        <!-- Coming soon view — shown instead of register form -->
+        <div id="comingSoonView" style="display:none;flex-direction:column;align-items:center;gap:16px;padding:24px 0;text-align:center;">
+          <p style="font-size:2.4rem;line-height:1;">🚀</p>
+          <h3 style="margin:0;font-size:1.2rem;font-weight:700;color:var(--text);">Coming Soon</h3>
+          <p style="margin:0;color:var(--muted);font-size:0.92rem;line-height:1.6;max-width:260px;">
+            Registration is not open yet. We'll let you know when it is.
+          </p>
+        </div>
+
+        <p class="auth-switch" id="switchWrap">
+          No account?
+          <button id="switchAuth">Create one</button>
+        </p>
+
+        <p id="authStatus" class="auth-status"></p>
+      </div>
+    </div>
+
+    <script type="module" src="index.js"></script>
+
+    <footer class="site-footer">
+      <a href="terms.html">Terms of Service</a>
+      <span class="footer-sep">·</span>
+      <a href="privacy.html">Privacy Policy</a>
+    </footer>
+  </body>
 </html>
