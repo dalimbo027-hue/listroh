@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delete Account — Listroh</title>
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a24;
+      --border: rgba(255,255,255,0.08);
+      --text: #e2e2e8;
+      --muted: #8c8c9a;
+      --accent: #2563eb;
+      --accent-light: #93b4f7;
+      --danger: #ef4444;
+      --danger-bg: rgba(239,68,68,0.08);
+      --danger-border: rgba(239,68,68,0.2);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      padding: 0 16px 80px;
+    }
+    header {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 52px 0 32px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 22px; font-weight: 700; color: var(--accent-light); }
+    h1 { font-size: 28px; font-weight: 700; margin-top: 14px; }
+    .meta { color: var(--muted); font-size: 14px; margin-top: 8px; }
+    main { max-width: 600px; margin: 0 auto; padding-top: 40px; }
+    h2 {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 36px 0 12px;
+      color: var(--accent-light);
+    }
+    p { margin-bottom: 14px; color: var(--text); }
+    a { color: var(--accent-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Method card */
+    .method {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+    .method-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      background: rgba(37,99,235,0.15);
+      color: var(--accent-light);
+      border: 1px solid rgba(37,99,235,0.25);
+    }
+    .steps {
+      padding-left: 20px;
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+    .steps li {
+      margin-bottom: 6px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .steps li span {
+      color: var(--text);
+    }
+
+    /* Warning box */
+    .warning {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 28px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .warning-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .warning p {
+      margin: 0;
+      font-size: 14px;
+      color: #fca5a5;
+      line-height: 1.6;
+    }
+
+    /* Data table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px;
+      font-size: 14px;
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+    }
+    th {
+      color: var(--accent-light);
+      font-weight: 600;
+      background: rgba(37,99,235,0.05);
+    }
+    td { color: var(--muted); }
+    td:first-child { color: var(--text); }
+
+    /* Email button */
+    .email-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      padding: 12px 28px;
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+    .email-btn:hover { opacity: 0.9; text-decoration: none; }
+
+    footer {
+      max-width: 600px;
+      margin: 64px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Listroh</div>
+  <h1>Delete your account</h1>
+  <p class="meta">You can delete your Listroh account at any time using either method below.</p>
+</header>
+
+<main>
+
+  <!-- Warning -->
+  <div class="warning">
+    <span class="warning-icon">⚠️</span>
+    <p>
+      Account deletion is <strong>permanent and irreversible.</strong>
+      All your data will be deleted and cannot be recovered.
+    </p>
+  </div>
+
+  <!-- Method 1 -->
+  <h2>Method 1 — Delete directly in the app</h2>
+  <div class="method">
+    <div class="method-title">
+      In-app deletion
+      <span class="badge">Instant</span>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:0;">
+      The fastest way. Your account is deleted immediately.
+    </p>
+    <ol class="steps">
+      <li>Open the <span>Listroh app</span> on your device</li>
+      <li>Tap the <span>menu icon</span> in the top left</li>
+      <li>Go to <span>Settings</span></li>
+      <li>Scroll down to <span>Danger Zone</span></li>
+      <li>Tap <span>Delete Account</span></li>
+      <li>Confirm by tapping <span>Delete</span> in the dialog</li>
+    </ol>
+  </div>
+
+  <!-- Method 2 -->
+  <h2>Method 2 — Request deletion by email</h2>
+  <div class="method">
+    <div class="method-title">
+      Email request
+      <span class="badge">Within 30 days</span>
+    </div>
+    <p style="font-size:14px; color:var(--muted); margin-bottom:12px;">
+      If you no longer have access to the app, email us and
+      we will delete your account within 30 days.
+    </p>
+    <a href="mailto:dalimbo027@gmail.com?subject=Account%20deletion%20request&body=Please%20delete%20my%20Listroh%20account.%0A%0AEmail%20address%20on%20account%3A%20%5Byour%20email%5D%0AUsername%3A%20%5Byour%20username%5D"
+       class="email-btn">
+      Email dalimbo027@gmail.com
+    </a>
+  </div>
+
+  <!-- What gets deleted -->
+  <h2>What gets deleted</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>When deleted</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Your profile (username, bio, avatar)</td>
+        <td>Immediately</td>
+      </tr>
+      <tr>
+        <td>All lists you created</td>
+        <td>Immediately</td>
+      </tr>
+      <tr>
+        <td>Your saved lists and favourites</td>
+        <td>Immediately</td>
+      </tr>
+      <tr>
+        <td>Your follow relationships</td>
+        <td>Immediately</td>
+      </tr>
+      <tr>
+        <td>Your avatar image (storage)</td>
+        <td>Within 7 days</td>
+      </tr>
+      <tr>
+        <td>Database backups containing your data</td>
+        <td>Within 30 days</td>
+      </tr>
+      <tr>
+        <td>Your consent record</td>
+        <td>Within 12 months
+          <span style="font-size:12px;color:var(--muted)">
+            (required by GDPR Art. 7)
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Contact -->
+  <h2>Questions?</h2>
+  <p>
+    If you have any questions about your data or the deletion process,
+    contact us at
+    <a href="mailto:dalimbo027@gmail.com">dalimbo027@gmail.com</a>.
+    We respond to all requests within 30 days.
+  </p>
+
+</main>
+
+<footer>
+  &copy; 2026 Listroh &nbsp;·&nbsp;
+  <a href="index.html">Home</a>&nbsp;·&nbsp;
+  <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+  <a href="terms.html">Terms of Service</a>
+</footer>
+
+</body>
+</html>
