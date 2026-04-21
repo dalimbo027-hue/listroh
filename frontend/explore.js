@@ -174,6 +174,7 @@ function applyFilter() {
   fetchLists(true);
 }
 
+
 searchBtn.addEventListener("click", applyFilter);
 searchInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter") applyFilter();

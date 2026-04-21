@@ -6,3 +6,4 @@
 .env.test
 /config.env
 /secrets/
+node_modules/

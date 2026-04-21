@@ -24,6 +24,7 @@ const authPassword   = document.getElementById("authPassword");
 const comingSoonView = document.getElementById("comingSoonView");
 const switchWrap     = document.getElementById("switchWrap");
 
+
 let isLogin = true;
 
 // ---------------- UI OPEN/CLOSE ----------------
