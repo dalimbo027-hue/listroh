@@ -159,10 +159,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve frontend — files live in the same directory as backend.js
-app.use(express.static(path.join(__dirname), { index: false }));
+// Serve frontend files from the frontend/ subfolder
+app.use(express.static(path.join(__dirname, "frontend"), { index: false }));
 app.get("/", (req, res) =>
-  res.sendFile(path.join(__dirname, "index.html")),
+  res.sendFile(path.join(__dirname, "frontend/index.html")),
 );
 
 // -------------------
@@ -172,8 +172,8 @@ app.get("/", (req, res) =>
   const required = ["SUPABASE_URL", "SUPABASE_ANON_KEY"];
   const missing  = required.filter(k => !process.env[k]);
   if (missing.length) {
-    console.error(`❌ Missing required environment variables: ${missing.join(", ")}`);
-    console.error("   Set them in Render → your service → Environment tab.");
+    console.error(`❌ Missing environment variables: ${missing.join(", ")}`);
+    console.error("   Add them in Render → your service → Environment tab.");
   } else {
     safeLog("✅ Environment variables OK");
   }
@@ -188,9 +188,9 @@ app.get("/config", limiter, (req, res) => {
   const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    safeLog("❌ /config called but SUPABASE_URL or SUPABASE_ANON_KEY is not set");
+    safeLog("❌ /config: SUPABASE_URL or SUPABASE_ANON_KEY not set");
     return res.status(503).json({
-      error: "Server configuration incomplete. Set SUPABASE_URL and SUPABASE_ANON_KEY in your environment.",
+      error: "Server configuration incomplete. Set SUPABASE_URL and SUPABASE_ANON_KEY in your Render environment.",
     });
   }
 
