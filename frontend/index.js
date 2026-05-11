@@ -45,7 +45,7 @@ function closeAuth() {
 }
 
 // ---------------- COMING SOON SWITCH ----------------
-// Registration is not open yet — show Coming Soon instead of a register form.
+// Registration is done through the mobile app only.
 
 function showLoginView() {
   isLogin = true;
@@ -59,7 +59,7 @@ function showLoginView() {
 
 function showComingSoonView() {
   isLogin = false;
-  authTitle.textContent        = "Coming soon";
+  authTitle.textContent        = "Get the app";
   authForm.style.display       = "none";
   comingSoonView.style.display = "flex";
   switchWrap.style.display     = "block";

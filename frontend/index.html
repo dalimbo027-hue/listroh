@@ -70,13 +70,55 @@
           </button>
         </form>
 
-        <!-- Coming soon view — shown instead of register form -->
-        <div id="comingSoonView" style="display:none;flex-direction:column;align-items:center;gap:16px;padding:24px 0;text-align:center;">
-          <p style="font-size:2.4rem;line-height:1;">🚀</p>
-          <h3 style="margin:0;font-size:1.2rem;font-weight:700;color:var(--text);">Coming Soon</h3>
-          <p style="margin:0;color:var(--muted);font-size:0.92rem;line-height:1.6;max-width:260px;">
-            Registration is not open yet. We'll let you know when it is.
+        <!-- Register via app view — shown when user clicks "Create one" -->
+        <div id="comingSoonView" style="display:none;flex-direction:column;align-items:center;gap:14px;padding:16px 0;text-align:center;">
+
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:1.6rem;">📱</span>
+            <div style="text-align:left;">
+              <h3 style="margin:0;font-size:1.05rem;font-weight:800;color:var(--text);">Register via our app</h3>
+              <p style="margin:2px 0 0;font-size:0.8rem;color:var(--muted);">Scan the QR code or tap the button below</p>
+            </div>
+          </div>
+
+          <!-- Static pre-generated QR code image -->
+          <img
+            src="listroh-qr.png"
+            alt="Scan to download Listroh on Google Play"
+            width="160"
+            height="160"
+            style="
+              border-radius:14px;
+              background:#fff;
+              padding:10px;
+              box-shadow:0 4px 20px rgba(0,0,0,0.3);
+              display:block;
+            "
+          />
+
+          <p style="margin:0;font-size:0.78rem;color:var(--muted);">
+            Scan with your phone camera to open Google Play
           </p>
+
+          <!-- Direct link for mobile users already on their phone -->
+          <a
+            href="https://play.google.com/store/apps/details?id=com.listroh.listroh"
+            target="_blank"
+            rel="noopener"
+            style="
+              display:inline-flex;align-items:center;gap:8px;
+              padding:11px 22px;border-radius:12px;
+              background:var(--accent);color:#001;
+              text-decoration:none;font-weight:800;font-size:0.9rem;
+            "
+          >
+            ⬇️ Download on Google Play
+          </a>
+
+          <p style="margin:0;font-size:0.75rem;color:var(--muted);line-height:1.5;max-width:240px;">
+            Registration is available exclusively through the Listroh mobile app.
+          </p>
+
         </div>
 
         <p class="auth-switch" id="switchWrap">
@@ -96,6 +138,8 @@
       <a href="privacy.html">Privacy Policy</a>
       <span class="footer-sep">·</span>
       <a href="csae.html">CSAE</a>
+      <span class="footer-sep">·</span>
+      <a href="help.html">Help</a>
       <span class="footer-sep">·</span>
       <a href="delete.html">Delete Account</a>
 

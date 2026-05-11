@@ -29,7 +29,14 @@
       padding: 52px 0 32px;
       border-bottom: 1px solid var(--border);
     }
-    .logo { font-size: 22px; font-weight: 700; color: var(--accent-light); }
+    .logo { 
+      font-size: 6rem; 
+      font-weight: 800; 
+      color: var(--accent); 
+      cursor: pointer; 
+      text-decoration: none;
+      display: inline-block;
+    }
     h1 { font-size: 32px; font-weight: 700; margin-top: 14px; line-height: 1.2; }
     .meta { color: var(--muted); font-size: 14px; margin-top: 8px; }
     main { max-width: 740px; margin: 0 auto; padding-top: 44px; }
@@ -73,7 +80,9 @@
 <body>
 
 <header>
-  <div class="logo">Listroh</div>
+  <div class="logo">
+      <a href="index.html" class="logo small" id="logoTitle" rel="noopener" >Listroh</a>
+  </div>
   <h1>Terms of Service</h1>
   <p class="meta">Last updated: April 2026 &nbsp;·&nbsp; Version 1</p>
 </header>
@@ -353,7 +362,9 @@
 <footer>
   &copy; 2026 Listroh &nbsp;·&nbsp;
   <a href="index.html">Home</a> &nbsp;·&nbsp;
-  <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+  <a href="help.html">Help</a> &nbsp;·&nbsp;
+  <a href="csae.html">CSAE</a> &nbsp;·&nbsp;
   <a href="mailto:dalimbo027@gmail.com">Contact</a>
 </footer>
 

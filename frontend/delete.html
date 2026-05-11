@@ -32,7 +32,14 @@
       padding: 52px 0 32px;
       border-bottom: 1px solid var(--border);
     }
-    .logo { font-size: 22px; font-weight: 700; color: var(--accent-light); }
+    .logo { 
+      font-size: 6rem; 
+      font-weight: 800; 
+      color: var(--accent); 
+      cursor: pointer; 
+      text-decoration: none;
+      display: inline-block;
+    }
     h1 { font-size: 28px; font-weight: 700; margin-top: 14px; }
     .meta { color: var(--muted); font-size: 14px; margin-top: 8px; }
     main { max-width: 600px; margin: 0 auto; padding-top: 40px; }
@@ -155,7 +162,9 @@
 <body>
 
 <header>
-  <div class="logo">Listroh</div>
+  <div class="logo">      
+    <a href="index.html" class="logo small" id="logoTitle" rel="noopener" >Listroh</a>
+  </div>
   <h1>Delete your account</h1>
   <p class="meta">You can delete your Listroh account at any time using either method below.</p>
 </header>
@@ -202,10 +211,9 @@
       If you no longer have access to the app, email us and
       we will delete your account within 30 days.
     </p>
-    <a href="mailto:dalimbo027@gmail.com?subject=Account%20deletion%20request&body=Please%20delete%20my%20Listroh%20account.%0A%0AEmail%20address%20on%20account%3A%20%5Byour%20email%5D%0AUsername%3A%20%5Byour%20username%5D"
-       class="email-btn">
-      Email dalimbo027@gmail.com
-    </a>
+    <a href="mailto:support@listroh.com?subject=Account%20deletion%20request&body=Please%20delete%20my%20Listroh%20account.%0A%0AEmail%20address%20on%20account%3A%20%5Byour%20email%5D%0AUsername%3A%20%5Byour%20username%5D"
+       class="email-btn">Email support@listroh.com
+  </a>
   </div>
 
   <!-- What gets deleted -->
@@ -258,7 +266,11 @@
   <p>
     If you have any questions about your data or the deletion process,
     contact us at
-    <a href="mailto:dalimbo027@gmail.com">dalimbo027@gmail.com</a>.
+    <a href="mailto:support@listroh.com
+
+">support@listroh.com
+
+</a>.
     We respond to all requests within 30 days.
   </p>
 
@@ -268,6 +280,8 @@
   &copy; 2026 Listroh &nbsp;·&nbsp;
   <a href="index.html">Home</a>&nbsp;·&nbsp;
   <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+  <a href="help.html">Help</a> &nbsp;·&nbsp;
+  <a href="csae.html">CSAE</a> &nbsp;·&nbsp;
   <a href="terms.html">Terms of Service</a>
 </footer>
 

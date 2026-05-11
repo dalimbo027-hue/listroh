@@ -872,6 +872,10 @@ async function initAdminIfNeeded() {
   document.getElementById("cancelReject").addEventListener("click",  closeRejectModal);
   document.getElementById("confirmReject").addEventListener("click", confirmReject);
 
+  // ── Tag modal buttons ──
+  document.getElementById("tagModalCancel").addEventListener("click", closeTagModal);
+  document.getElementById("tagModalSave").addEventListener("click",   saveTagModal);
+
   // ── Load when admin tab is opened via sidebar ──
   document.querySelector("[data-tab='adminTab']").addEventListener("click", () => {
     if (!adminState.total && !document.getElementById("adminPending").children.length) {
@@ -891,7 +895,7 @@ async function loadAdminTab() {
 
   const { data, error, count } = await supabase
     .from("lists")
-    .select("id, title, description, owner_id, visibility, rejection_reason, created_at, updated_at", { count: "exact" })
+    .select("id, title, description, tags, owner_id, visibility, rejection_reason, created_at, updated_at", { count: "exact" })
     .eq("visibility", visibility)
     .order(adminState.sort, { ascending: false })
     .range(from, to);
@@ -986,6 +990,34 @@ function renderAdminCard(list, items, ownerName) {
     card.appendChild(desc);
   }
 
+  // Tags
+  const tagList = Array.isArray(list.tags)
+    ? list.tags
+    : typeof list.tags === "string" && list.tags
+      ? list.tags.split(",").map(t => t.trim()).filter(Boolean)
+      : [];
+
+  if (tagList.length) {
+    const tagsEl = document.createElement("div");
+    tagsEl.style.cssText = "display:flex;flex-wrap:wrap;gap:5px;margin-top:2px;";
+    tagList.forEach(tag => {
+      const chip = document.createElement("span");
+      chip.style.cssText = `
+        padding:3px 10px;border-radius:999px;font-size:0.75rem;font-weight:700;
+        background:rgba(0,255,247,0.08);color:var(--accent);
+        border:1px solid rgba(0,255,247,0.18);
+      `;
+      chip.textContent = tag;
+      tagsEl.appendChild(chip);
+    });
+    card.appendChild(tagsEl);
+  } else {
+    const noTag = document.createElement("span");
+    noTag.style.cssText = "font-size:0.75rem;color:var(--muted);font-style:italic;";
+    noTag.textContent = "No tags";
+    card.appendChild(noTag);
+  }
+
   if (items.length) {
     const itemsEl = document.createElement("div");
     itemsEl.className = "admin-card-items";
@@ -1005,14 +1037,23 @@ function renderAdminCard(list, items, ownerName) {
   card.appendChild(actions);
 
   if (adminState.tab === "adminPending") {
+    // Tag button only if list has no tags
+    const hasTags = tagList.length > 0;
     actions.append(
-      makeBtn("✏️ Edit",     null,          () => openAdminEditor(list, items)),
-      makeBtn("✅ Approve",  "approve-btn", () => adminApprove(list.id)),
-      makeBtn("❌ Reject",   "reject-btn",  () => openRejectModal(list.id)),
+      makeBtn("✏️ Edit",    null,          () => openAdminEditor(list, items)),
+      makeBtn("✅ Approve", "approve-btn", () => adminApprove(list.id)),
+      makeBtn("❌ Reject",  "reject-btn",  () => openRejectModal(list.id)),
     );
+    if (!hasTags) {
+      actions.appendChild(makeBtn("🏷️ Add Tags", "tag-btn", () => openTagModal(list.id)));
+    }
   }
 
   if (adminState.tab === "adminPublished") {
+    const hasTags = tagList.length > 0;
+    if (!hasTags) {
+      actions.appendChild(makeBtn("🏷️ Add Tags", "tag-btn", () => openTagModal(list.id)));
+    }
     actions.append(
       makeBtn("🗑 Delete", "danger-btn", () => adminDeleteForever(list.id)),
     );
@@ -1020,8 +1061,8 @@ function renderAdminCard(list, items, ownerName) {
 
   if (adminState.tab === "adminRejected") {
     actions.append(
-      makeBtn("↩️ Undo",   null,          () => adminUndoReject(list.id)),
-      makeBtn("🗑 Delete", "danger-btn",  () => adminDeleteForever(list.id)),
+      makeBtn("↩️ Undo",   null,         () => adminUndoReject(list.id)),
+      makeBtn("🗑 Delete", "danger-btn", () => adminDeleteForever(list.id)),
     );
   }
 
@@ -1118,11 +1159,151 @@ async function adminDeleteForever(id) {
 // ── EDIT MODAL ────────────────────────────────────────────────────────────────
 let adminEditId = null;
 
+// ── TAG TAXONOMY ─────────────────────────────────────────────────────────────
+const TAG_TAXONOMY = {
+  "Entertainment": ["Movies","TV Shows","Anime","Documentaries","Streaming","Comedy","Drama","Horror","Sci-Fi"],
+  "Music":         ["Pop","Hip-Hop","Rock","Jazz","Classical","Electronic","R&B","Metal","Indie"],
+  "Sports":        ["Football","Cricket","Basketball","Tennis","Formula 1","Baseball","Boxing","Olympics"],
+  "Technology":    ["AI","Gadgets","Software","Gaming","Apps","Cybersecurity","Programming","Startups"],
+  "Food & Drink":  ["Restaurants","Street Food","Desserts","Cocktails","Vegan","Fast Food","Coffee","World Cuisines"],
+  "Travel":        ["Asia","Europe","Americas","Africa","Middle East","Beach","Adventure","Budget Travel","Luxury"],
+  "Books":         ["Fiction","Non-Fiction","Sci-Fi","Mystery","Self-Help","Biography","Fantasy","History"],
+  "Gaming":        ["PC","PlayStation","Xbox","Nintendo","Mobile","RPG","FPS","Strategy","Indie Games"],
+  "Fashion":       ["Streetwear","Luxury","Sneakers","Accessories","Vintage","Athleisure","Sustainable Fashion"],
+  "Lifestyle":     ["Health","Fitness","Mindfulness","Productivity","Home Decor","Relationships","Finance","Education"],
+  "Cars & Bikes":  ["Supercars","SUVs","EVs","Motorcycles","Classic Cars","Off-Road","Trucks"],
+  "Science":       ["Space","Biology","Physics","Climate","Medicine","Psychology","Engineering"],
+};
+
+// Current tag state for the open editor
+let _adminPrimaryTag   = null;
+let _adminSecondaryTag = null;
+
+function buildTagPicker(existingTags) {
+  // Parse existing tags — index 0 = primary, index 1 = secondary
+  const existing = Array.isArray(existingTags)
+    ? existingTags
+    : typeof existingTags === "string" && existingTags
+      ? existingTags.split(",").map(t => t.trim()).filter(Boolean)
+      : [];
+
+  _adminPrimaryTag   = existing[0] || null;
+  _adminSecondaryTag = existing[1] || null;
+
+  renderPrimaryPicker();
+  renderSelectedTagsDisplay();
+}
+
+function renderPrimaryPicker() {
+  const container = document.getElementById("adminPrimaryTags");
+  container.innerHTML = "";
+
+  Object.keys(TAG_TAXONOMY).forEach(category => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = category;
+    btn.style.cssText = `
+      padding:6px 12px;border-radius:999px;border:1px solid var(--panel-border);
+      background:${_adminPrimaryTag === category ? "var(--accent-2)" : "var(--glass)"};
+      color:${_adminPrimaryTag === category ? "#fff" : "var(--text)"};
+      cursor:pointer;font-size:0.82rem;font-weight:700;font-family:inherit;
+      transition:background 0.15s;
+    `;
+
+    btn.addEventListener("click", () => {
+      // Toggle off if already selected
+      if (_adminPrimaryTag === category) {
+        _adminPrimaryTag   = null;
+        _adminSecondaryTag = null;
+        document.getElementById("adminSecondaryWrap").style.display = "none";
+      } else {
+        _adminPrimaryTag   = category;
+        _adminSecondaryTag = null;
+        renderSecondaryPicker(category);
+        document.getElementById("adminSecondaryWrap").style.display = "block";
+      }
+      renderPrimaryPicker();
+      renderSelectedTagsDisplay();
+    });
+
+    container.appendChild(btn);
+  });
+
+  // If a primary is already set, show the secondary picker
+  if (_adminPrimaryTag && TAG_TAXONOMY[_adminPrimaryTag]) {
+    renderSecondaryPicker(_adminPrimaryTag);
+    document.getElementById("adminSecondaryWrap").style.display = "block";
+  }
+}
+
+function renderSecondaryPicker(category) {
+  const container = document.getElementById("adminSecondaryTags");
+  container.innerHTML = "";
+
+  (TAG_TAXONOMY[category] || []).forEach(tag => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = tag;
+    btn.style.cssText = `
+      padding:5px 11px;border-radius:999px;border:1px solid var(--panel-border);
+      background:${_adminSecondaryTag === tag ? "rgba(0,255,247,0.15)" : "var(--glass)"};
+      color:${_adminSecondaryTag === tag ? "var(--accent)" : "var(--muted)"};
+      cursor:pointer;font-size:0.78rem;font-weight:600;font-family:inherit;
+      border-color:${_adminSecondaryTag === tag ? "rgba(0,255,247,0.35)" : "var(--panel-border)"};
+      transition:background 0.15s;
+    `;
+
+    btn.addEventListener("click", () => {
+      _adminSecondaryTag = _adminSecondaryTag === tag ? null : tag;
+      renderSecondaryPicker(category);
+      renderSelectedTagsDisplay();
+    });
+
+    container.appendChild(btn);
+  });
+}
+
+function renderSelectedTagsDisplay() {
+  const el = document.getElementById("adminTagsSelected");
+  if (!el) return;
+  el.innerHTML = "";
+
+  const tags = [_adminPrimaryTag, _adminSecondaryTag].filter(Boolean);
+
+  if (!tags.length) {
+    const hint = document.createElement("span");
+    hint.style.cssText = "font-size:0.75rem;color:var(--muted);font-style:italic;";
+    hint.textContent = "No tags selected";
+    el.appendChild(hint);
+    return;
+  }
+
+  const labels = ["Primary", "Secondary"];
+  tags.forEach((tag, i) => {
+    const chip = document.createElement("span");
+    chip.style.cssText = `
+      display:inline-flex;align-items:center;gap:5px;
+      padding:4px 12px;border-radius:999px;font-size:0.78rem;font-weight:700;
+      background:rgba(0,255,247,0.08);color:var(--accent);
+      border:1px solid rgba(0,255,247,0.2);
+    `;
+    chip.innerHTML = `
+      <span style="font-size:0.68rem;opacity:0.6;">${labels[i]}</span>
+      ${tag}
+    `;
+    el.appendChild(chip);
+  });
+}
+
+// ── EDITOR ───────────────────────────────────────────────────────────────────
 function openAdminEditor(list, items) {
   adminEditId = list.id;
-  document.getElementById("adminEditTitle").value    = list.title       || "";
-  document.getElementById("adminEditDesc").value     = list.description || "";
+  document.getElementById("adminEditTitle").value         = list.title       || "";
+  document.getElementById("adminEditDesc").value          = list.description || "";
   document.getElementById("adminModalStatus").textContent = "";
+
+  // Build the tag picker with existing tags pre-selected
+  buildTagPicker(list.tags);
 
   const itemsEl = document.getElementById("adminEditItems");
   itemsEl.innerHTML = "";
@@ -1132,8 +1313,157 @@ function openAdminEditor(list, items) {
 }
 
 function closeEditModal() {
-  adminEditId = null;
+  adminEditId        = null;
+  _adminPrimaryTag   = null;
+  _adminSecondaryTag = null;
   document.getElementById("adminEditModal").style.display = "none";
+}
+
+// ── TAG-ONLY MODAL ────────────────────────────────────────────────────────────
+// Only accessible when list has no tags. Admin-only. Saves primary + secondary.
+
+let _tagModalListId = null;
+let _tagModalPrimary   = null;
+let _tagModalSecondary = null;
+
+function openTagModal(listId) {
+  _tagModalListId    = listId;
+  _tagModalPrimary   = null;
+  _tagModalSecondary = null;
+  document.getElementById("tagModalStatus").textContent   = "";
+  document.getElementById("tagModalSecondaryWrap").style.display = "none";
+
+  renderTagModalPrimary();
+  renderTagModalSelected();
+
+  document.getElementById("adminTagModal").style.display = "flex";
+}
+
+function closeTagModal() {
+  _tagModalListId    = null;
+  _tagModalPrimary   = null;
+  _tagModalSecondary = null;
+  document.getElementById("adminTagModal").style.display = "none";
+}
+
+function renderTagModalPrimary() {
+  const container = document.getElementById("tagModalPrimary");
+  container.innerHTML = "";
+
+  Object.keys(TAG_TAXONOMY).forEach(category => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = category;
+    btn.style.cssText = `
+      padding:6px 12px;border-radius:999px;border:1px solid var(--panel-border);
+      background:${_tagModalPrimary === category ? "var(--accent-2)" : "var(--glass)"};
+      color:${_tagModalPrimary === category ? "#fff" : "var(--text)"};
+      cursor:pointer;font-size:0.82rem;font-weight:700;font-family:inherit;
+    `;
+    btn.addEventListener("click", () => {
+      if (_tagModalPrimary === category) {
+        _tagModalPrimary   = null;
+        _tagModalSecondary = null;
+        document.getElementById("tagModalSecondaryWrap").style.display = "none";
+      } else {
+        _tagModalPrimary   = category;
+        _tagModalSecondary = null;
+        renderTagModalSecondary(category);
+        document.getElementById("tagModalSecondaryWrap").style.display = "block";
+      }
+      renderTagModalPrimary();
+      renderTagModalSelected();
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderTagModalSecondary(category) {
+  const container = document.getElementById("tagModalSecondary");
+  container.innerHTML = "";
+
+  (TAG_TAXONOMY[category] || []).forEach(tag => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = tag;
+    btn.style.cssText = `
+      padding:5px 11px;border-radius:999px;border:1px solid var(--panel-border);
+      background:${_tagModalSecondary === tag ? "rgba(0,255,247,0.15)" : "var(--glass)"};
+      color:${_tagModalSecondary === tag ? "var(--accent)" : "var(--muted)"};
+      border-color:${_tagModalSecondary === tag ? "rgba(0,255,247,0.35)" : "var(--panel-border)"};
+      cursor:pointer;font-size:0.78rem;font-weight:600;font-family:inherit;
+    `;
+    btn.addEventListener("click", () => {
+      _tagModalSecondary = _tagModalSecondary === tag ? null : tag;
+      renderTagModalSecondary(category);
+      renderTagModalSelected();
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderTagModalSelected() {
+  const el = document.getElementById("tagModalSelected");
+  if (!el) return;
+  el.innerHTML = "";
+
+  const tags = [_tagModalPrimary, _tagModalSecondary].filter(Boolean);
+  if (!tags.length) {
+    const hint = document.createElement("span");
+    hint.style.cssText = "font-size:0.75rem;color:var(--muted);font-style:italic;";
+    hint.textContent = "No tags selected yet";
+    el.appendChild(hint);
+    return;
+  }
+
+  const labels = ["Primary", "Secondary"];
+  tags.forEach((tag, i) => {
+    const chip = document.createElement("span");
+    chip.style.cssText = `
+      display:inline-flex;align-items:center;gap:5px;
+      padding:4px 12px;border-radius:999px;font-size:0.78rem;font-weight:700;
+      background:rgba(0,255,247,0.08);color:var(--accent);
+      border:1px solid rgba(0,255,247,0.2);
+    `;
+    chip.innerHTML = `<span style="font-size:0.68rem;opacity:0.6;">${labels[i]}</span> ${tag}`;
+    el.appendChild(chip);
+  });
+}
+
+async function saveTagModal() {
+  if (!_tagModalListId) return;
+
+  const statusEl = document.getElementById("tagModalStatus");
+
+  if (!_tagModalPrimary) {
+    statusEl.textContent = "Please select a primary category.";
+    statusEl.style.color = "#ff8080";
+    return;
+  }
+
+  const saveBtn = document.getElementById("tagModalSave");
+  saveBtn.disabled    = true;
+  saveBtn.textContent = "Saving…";
+  statusEl.textContent = "";
+
+  const tags = [_tagModalPrimary, _tagModalSecondary].filter(Boolean);
+
+  const { error } = await supabase
+    .from("lists")
+    .update({ tags, updated_at: new Date().toISOString() })
+    .eq("id", _tagModalListId);
+
+  saveBtn.disabled    = false;
+  saveBtn.textContent = "💾 Save Tags";
+
+  if (error) {
+    statusEl.textContent = error.message;
+    statusEl.style.color = "#ff8080";
+    return;
+  }
+
+  closeTagModal();
+  loadAdminTab();
 }
 
 function adminAddItemRow(value) {
@@ -1165,6 +1495,8 @@ async function adminSaveList(approve) {
 
   const title       = document.getElementById("adminEditTitle").value.trim();
   const description = document.getElementById("adminEditDesc").value.trim();
+  // Read tags from picker state — [primaryTag, secondaryTag] filtered of nulls
+  const tags        = [_adminPrimaryTag, _adminSecondaryTag].filter(Boolean);
   const statusEl    = document.getElementById("adminModalStatus");
 
   if (!title) {
@@ -1192,6 +1524,7 @@ async function adminSaveList(approve) {
   const payload = {
     title,
     description: description || null,
+    tags:        tags.length ? tags : null,
     updated_at:  new Date().toISOString(),
   };
 

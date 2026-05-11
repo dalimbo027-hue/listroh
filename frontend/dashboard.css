@@ -650,3 +650,44 @@ html, body {
     flex-wrap: wrap;
   }
 }
+/* ── Admin tag chips ── */
+.admin-tag-chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(0, 255, 247, 0.08);
+  color: var(--accent);
+  border: 1px solid rgba(0, 255, 247, 0.18);
+  white-space: nowrap;
+}
+
+[data-theme="light"] .admin-tag-chip {
+  background: rgba(0, 148, 255, 0.08);
+  color: var(--accent);
+  border-color: rgba(0, 148, 255, 0.2);
+}
+
+/* ── Admin tag picker ── */
+#adminPrimaryTags button:hover,
+#adminSecondaryTags button:hover {
+  opacity: 0.85;
+}
+
+#adminSecondaryWrap {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--glass);
+  border: 1px solid var(--panel-border);
+}
+
+/* ── Add Tags button on admin cards ── */
+.admin-card-actions button.tag-btn {
+  background: rgba(0, 255, 247, 0.08);
+  color: var(--accent);
+  border: 1px solid rgba(0, 255, 247, 0.2);
+}
+
+.admin-card-actions button.tag-btn:hover {
+  background: rgba(0, 255, 247, 0.18);
+}

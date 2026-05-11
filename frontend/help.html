@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Help & FAQ — Listroh</title>
+
+  <style>
+    :root {
+      --bg:           #0f0f13;
+      --surface:      #1a1a24;
+      --surface2:     #13131a;
+      --border:       rgba(255,255,255,0.08);
+      --text:         #e2e2e8;
+      --muted:        #8c8c9a;
+      --accent:       #2563eb;
+      --accent-light: #93b4f7;
+      --green:        #10b981;
+      --amber:        #d97706;
+      --red:          #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 16px;
+      line-height: 1.75;
+      padding: 0 16px 80px;
+    }
+
+    a { color: var(--accent-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── HEADER ── */
+    header {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 52px 0 36px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo { 
+      font-size: 6rem; 
+      font-weight: 800; 
+      color: var(--accent); 
+      cursor: pointer; 
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      margin-top: 14px;
+      line-height: 1.2;
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 15px;
+      margin-top: 10px;
+    }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      max-width: 860px;
+      margin: 36px auto 0;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-wrap input:focus { border-color: var(--accent); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      max-width: 860px;
+      margin: 48px auto 0;
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    @media (max-width: 680px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      h1 { font-size: 26px; }
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: sticky;
+      top: 24px;
+    }
+
+    .sidebar-section {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin: 20px 0 8px;
+    }
+
+    .sidebar-section:first-child { margin-top: 0; }
+
+    .sidebar a {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: rgba(37,99,235,0.12);
+      color: var(--accent-light);
+      text-decoration: none;
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {}
+
+    .section {
+      margin-bottom: 56px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(37,99,235,0.10);
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent-light);
+    }
+
+    /* ── FAQ ACCORDION ── */
+    .faq-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .faq-item:hover { border-color: rgba(37,99,235,0.3); }
+
+    .faq-q {
+      width: 100%;
+      background: var(--surface);
+      border: none;
+      padding: 16px 20px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+
+    .faq-q:hover { background: #1f1f2e; }
+
+    .faq-q .arrow {
+      font-size: 18px;
+      color: var(--muted);
+      transition: transform 0.25s;
+      flex-shrink: 0;
+    }
+
+    .faq-q.open .arrow { transform: rotate(180deg); color: var(--accent-light); }
+    .faq-q.open { background: #1a1a2e; }
+
+    .faq-a {
+      display: none;
+      padding: 0 20px 18px;
+      background: var(--surface2);
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-a.open { display: block; }
+
+    .faq-a p { margin-top: 14px; }
+    .faq-a p:first-child { margin-top: 14px; }
+
+    .faq-a ul {
+      padding-left: 20px;
+      margin-top: 10px;
+    }
+
+    .faq-a li { margin-bottom: 6px; }
+
+    /* ── CALLOUT ── */
+    .callout {
+      background: rgba(37,99,235,0.08);
+      border: 1px solid rgba(37,99,235,0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .callout.green {
+      background: rgba(16,185,129,0.08);
+      border-color: rgba(16,185,129,0.2);
+    }
+
+    .callout.amber {
+      background: rgba(217,119,6,0.08);
+      border-color: rgba(217,119,6,0.2);
+    }
+
+    /* ── STEPS ── */
+    .steps { list-style: none; padding: 0; margin: 0; }
+
+    .steps li {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* ── CONTACT CARD ── */
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+
+    .contact-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      transition: border-color 0.2s;
+    }
+
+    .contact-card:hover { border-color: rgba(37,99,235,0.35); }
+
+    .contact-card .icon { font-size: 26px; margin-bottom: 10px; }
+    .contact-card .title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+    .contact-card .desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── TAG BADGE ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .badge.new { background: rgba(16,185,129,0.15); color: var(--green); }
+    .badge.tip { background: rgba(37,99,235,0.12); color: var(--accent-light); }
+
+    /* ── FOOTER ── */
+    footer {
+      max-width: 860px;
+      margin: 64px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--accent-light); }
+  </style>
+</head>
+
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────────── -->
+<header>
+  <div class="logo">
+      <a href="index.html" class="logo small" id="logoTitle" rel="noopener" >Listroh</a>
+</div>
+
+  <h1>Help &amp; FAQ</h1>
+  <p class="tagline">Everything you need to know about using Listroh.</p>
+</header>
+
+<!-- ── SEARCH ──────────────────────────────────────────────────── -->
+<div class="search-wrap">
+  <input
+    type="text"
+    id="faqSearch"
+    placeholder="Search questions — e.g. &ldquo;submit list&rdquo; or &ldquo;phone login&rdquo;"
+    oninput="filterFAQ(this.value)"
+    autocomplete="off"
+  />
+</div>
+
+<!-- ── LAYOUT ──────────────────────────────────────────────────── -->
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-section">Getting Started</div>
+    <a href="#getting-started">Creating an Account</a>
+    <a href="#login">Logging In</a>
+
+    <div class="sidebar-section">Lists</div>
+    <a href="#creating-lists">Creating Lists</a>
+    <a href="#tags">Tags &amp; Categories</a>
+    <a href="#submitting">Submitting for Review</a>
+    <a href="#review-process">Review Process</a>
+
+    <div class="sidebar-section">Discovery</div>
+    <a href="#global-feed">Global Feed</a>
+    <a href="#saving">Saving &amp; Favoriting</a>
+    <a href="#following">Following Creators</a>
+
+    <div class="sidebar-section">Account</div>
+    <a href="#profile">Your Profile</a>
+    <a href="#settings">Settings</a>
+    <a href="#privacy">Privacy &amp; Data</a>
+
+    <div class="sidebar-section">Troubleshooting</div>
+    <a href="#troubleshooting">Common Issues</a>
+    <a href="#contact">Contact Us</a>
+  </nav>
+
+  <!-- ── MAIN ── -->
+  <main id="faqMain">
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- GETTING STARTED                                         -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="getting-started">
+      <div class="section-header">
+        <div class="section-icon">👋</div>
+        <h2>Creating an Account</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I create a Listroh account?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Open the app and tap <strong>Register</strong> on the auth screen. You can sign up with either an email address or a phone number.</p>
+          <ul>
+            <li><strong>Email:</strong> Enter your username, email, and a password (min 6 characters). We'll send a verification email — click the link to activate your account.</li>
+            <li><strong>Phone:</strong> Enter your username and phone number in international format (e.g. +91XXXXXXXXXX). We'll send a 6-digit code via SMS — enter it to verify instantly.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          I didn't receive a verification email. What should I do?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Check your <strong>spam or junk folder</strong> first - our emails come from <strong>noreply@listroh.app</strong> and some inboxes filter them automatically.</p>
+          <p>If it's not there, go to <strong>Settings → Email Verification → Resend</strong>. Wait a minute before trying again as emails can occasionally be delayed.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What is the minimum age to use Listroh?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>You must be at least <strong>13 years old</strong> to create an account on Listroh. If we become aware that a user is under 13, their account will be removed.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Can I use both email and phone on one account?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Yes. If you registered with a phone number, you can add an email address later by going to <strong>Settings → Add Email Address</strong>. This lets you also log in with email and password in addition to phone OTP.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- LOGIN                                                   -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="login">
+      <div class="section-header">
+        <div class="section-icon">🔑</div>
+        <h2>Logging In</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I log in?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>On the login screen, enter your <strong>email address or phone number</strong> — Listroh detects which one you're using automatically.</p>
+          <ul>
+            <li><strong>Email:</strong> Enter your email and password, then tap Login.</li>
+            <li><strong>Phone:</strong> Enter your phone number, tap Send Code, then enter the 6-digit SMS code.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Does Listroh keep me logged in?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Yes. Once you log in, Listroh keeps your session active so you don't need to log in every time you open the app. Your session is restored automatically on the next launch.</p>
+          <p>Phone users are automatically logged in immediately after OTP verification — no extra steps needed.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          I forgot my password. How do I reset it?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Tap <strong>Forgot password?</strong> on the login screen. Enter your email address and we'll send a reset link. Check your spam folder if you don't see it — the email comes from noreply@listroh.app.</p>
+          <p>Note: password reset only applies to email accounts. If you registered with a phone number, you log in via SMS code and there is no password to reset.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Why does my email login say "Email not confirmed"?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>You need to click the verification link in the email we sent when you registered. Check your spam folder for an email from <strong>noreply@listroh.app</strong>.</p>
+          <p>If you've lost the email, go to <strong>Settings → Email Verification → Resend</strong> to get a new one.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- CREATING LISTS                                          -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="creating-lists">
+      <div class="section-header">
+        <div class="section-icon">📝</div>
+        <h2>Creating Lists</h2>
+      </div>
+
+      <div class="callout">
+        <strong>Tip:</strong> There are two types of lists on Listroh — <strong>Normal lists</strong> (any number of items, private only) and <strong>Top 10 lists</strong> (exactly 10 ranked items, can be published to the global feed).
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I create a list?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Tap the <strong>+ button</strong> at the bottom of the screen or tap <strong>New List</strong> in the sidebar menu. A sheet will open with two tabs — Normal and Top 10.</p>
+          <ul>
+            <li><strong>Normal list:</strong> Add a title, description, and any number of items.</li>
+            <li><strong>Top 10 list:</strong> Add a title, pick a category and sub-category, then rank exactly 10 items from #1 to #10.</li>
+          </ul>
+          <p>Tap <strong>Create</strong> when you're done. The list is saved to your My Lists page.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What is the difference between Normal and Top 10 lists?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <ul>
+            <li><strong>Normal lists</strong> — personal, private. Can have any number of items. Good for personal ranking notes, watchlists, or things to try. Cannot be published to the global feed.</li>
+            <li><strong>Top 10 lists</strong> — exactly 10 ranked items. Can be submitted for review and, if approved, published to the global feed where the community can discover, save, and favorite them.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Can I edit a list after creating it?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Yes, as long as it has not been submitted for review. Open <strong>My Lists</strong>, find the list, and tap the edit (pencil) icon.</p>
+          <p>Once a list is <strong>In Review</strong> or <strong>Published</strong>, editing is locked. If your list was rejected, you can edit and resubmit it.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Can I delete a list?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Yes. Tap the delete (trash) icon on any list in My Lists that is not currently under review. Published lists can also be deleted from your profile page.</p>
+          <p>Deletion is permanent and cannot be undone.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- TAGS                                                    -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="tags">
+      <div class="section-header">
+        <div class="section-icon">🏷️</div>
+        <h2>Tags &amp; Categories</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do tags work on Listroh?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>When creating a Top 10 list you can select up to <strong>two tags</strong> — a primary category and an optional sub-category.</p>
+          <p>For example: <strong>Entertainment</strong> (primary) → <strong>Movies</strong> (sub-category). Tags help users discover your list when filtering the global feed.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What categories are available?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Listroh has 12 primary categories, each with their own sub-tags:</p>
+          <ul>
+            <li>🎬 <strong>Entertainment</strong> — Movies, TV Shows, Anime, Documentaries, Streaming, Comedy, Drama, Horror, Sci-Fi</li>
+            <li>🎵 <strong>Music</strong> — Pop, Hip-Hop, Rock, Jazz, Classical, Electronic, R&B, Metal, Indie</li>
+            <li>⚽ <strong>Sports</strong> — Football, Cricket, Basketball, Tennis, Formula 1, Baseball, Boxing, Olympics</li>
+            <li>💻 <strong>Technology</strong> — AI, Gadgets, Software, Gaming, Apps, Cybersecurity, Programming, Startups</li>
+            <li>🍕 <strong>Food &amp; Drink</strong> — Restaurants, Street Food, Desserts, Cocktails, Vegan, Fast Food, Coffee, World Cuisines</li>
+            <li>✈️ <strong>Travel</strong> — Asia, Europe, Americas, Africa, Middle East, Beach, Adventure, Budget Travel, Luxury</li>
+            <li>📚 <strong>Books</strong> — Fiction, Non-Fiction, Mystery, Self-Help, Biography, Fantasy, History</li>
+            <li>🎮 <strong>Gaming</strong> — PC, PlayStation, Xbox, Nintendo, Mobile, RPG, FPS, Strategy, Indie Games</li>
+            <li>👗 <strong>Fashion</strong> — Streetwear, Luxury, Sneakers, Accessories, Vintage, Athleisure</li>
+            <li>🌿 <strong>Lifestyle</strong> — Health, Fitness, Mindfulness, Productivity, Home Decor, Finance, Education</li>
+            <li>🚗 <strong>Cars &amp; Bikes</strong> — Supercars, SUVs, EVs, Motorcycles, Classic Cars, Off-Road, Trucks</li>
+            <li>🔬 <strong>Science</strong> — Space, Biology, Physics, Climate, Medicine, Psychology, Engineering</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Can I change the tags after submitting a list?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Not while the list is under review or published. If your list is rejected, you can edit the tags before resubmitting. If you want to change tags on a published list, you would need to delete and recreate it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SUBMITTING                                              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="submitting">
+      <div class="section-header">
+        <div class="section-icon">🚀</div>
+        <h2>Submitting for Review</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I publish my Top 10 list?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>A Top 10 list must be <strong>complete</strong> before you can submit it — all 10 items must be filled in and the title must not be empty.</p>
+          <ol class="steps">
+            <li><span class="step-num">1</span>Open <strong>My Lists</strong> and find your Top 10 list.</li>
+            <li><span class="step-num">2</span>Make sure all 10 items are filled in.</li>
+            <li><span class="step-num">3</span>Tap the <strong>Submit</strong> button on the card.</li>
+            <li><span class="step-num">4</span>The list moves to <strong>In Review</strong> status.</li>
+            <li><span class="step-num">5</span>Our team reviews it and approves or rejects it.</li>
+            <li><span class="step-num">6</span>If approved, it appears on the global feed.</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Why can't I see the Submit button?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>The Submit button only appears when your Top 10 list is <strong>complete</strong> — all 10 items filled in with a non-empty title. If any item is blank the button won't appear.</p>
+          <p>Also check that you are on a <strong>Top 10</strong> list — Normal lists cannot be submitted for publication.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          My list was rejected. What do I do?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>If your list is rejected you'll see a red message on the card explaining the reason. Common reasons include:</p>
+          <ul>
+            <li>Content that violates our community guidelines</li>
+            <li>Items that are blank or low quality</li>
+            <li>Misleading or inaccurate title</li>
+            <li>Wrong category selected</li>
+          </ul>
+          <p>You can edit the list to address the issue and tap <strong>Submit</strong> again to resubmit it for review.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How many lists can I submit?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>There is no hard limit on the number of lists you can submit. However, submitting low-quality or repetitive lists may result in rejection or account action.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- REVIEW PROCESS                                          -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="review-process">
+      <div class="section-header">
+        <div class="section-icon">✅</div>
+        <h2>Review Process</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How long does the review take?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>We aim to review all submissions within <strong>24–72 hours</strong>. During high volume periods it may take a little longer. The status on your list card will update automatically when a decision is made.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What are the guidelines for a list to be approved?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Lists are approved if they:</p>
+          <ul>
+            <li>Have a clear, descriptive title</li>
+            <li>Contain all 10 genuine, non-blank items</li>
+            <li>Are in the correct category</li>
+            <li>Do not contain hate speech, spam, misinformation, or adult content</li>
+            <li>Are original — not a direct copy of another published list</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Will I be notified when my list is reviewed?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Yes. The status badge on your list card updates automatically — from <strong>In Review</strong> to either <strong>Published</strong> (green) or showing a red rejection message with the reason. Open the app to check the latest status.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- GLOBAL FEED                                             -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="global-feed">
+      <div class="section-header">
+        <div class="section-icon">🌍</div>
+        <h2>Global Feed</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What is the Global Feed?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>The Global Feed shows all approved Top 10 lists from creators across Listroh. It's the main discovery screen — scroll, filter by category, search by keyword, and sort by recency or popularity.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I filter the feed by category?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Below the search bar you'll see a row of category tags. Tap any tag to filter the feed. Tap <strong>All Tags</strong> at the end of the row to open a full tag picker with all 12 categories and their sub-tags — you can search within it too.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I sort the feed?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Below the category tags there is a sort row with three options:</p>
+          <ul>
+            <li><strong>Recent</strong> — newest lists first (default)</li>
+            <li><strong>Most Favorited</strong> — lists with the most ❤️ favorites</li>
+            <li><strong>Most Saved</strong> — lists saved by the most users</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Can I see the global feed without an account?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Yes — a preview of the global feed is visible on the first screen of the app before you log in. You can browse list titles and the first two items. To see full lists, save them, or follow creators you need to create an account.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SAVING & FAVORITING                                     -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="saving">
+      <div class="section-header">
+        <div class="section-icon">❤️</div>
+        <h2>Saving &amp; Favoriting</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What is the difference between saving and favoriting?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <ul>
+            <li><strong>Favorite (❤️)</strong> — shows your appreciation for a list. The creator sees the count go up. It does not add the list to your collection.</li>
+            <li><strong>Save (🔖)</strong> — adds the list to your <strong>Added Lists</strong> tab so you can find it easily later. Saved lists show a count so creators can see how many people have saved their work.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Where do I find my saved lists?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Tap the <strong>Added</strong> tab in the bottom navigation bar. All lists you have saved appear here. Tap any card to open the full list. Tap <strong>Remove</strong> to unsave it.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- FOLLOWING                                               -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="following">
+      <div class="section-header">
+        <div class="section-icon">👥</div>
+        <h2>Following Creators</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I follow someone?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Tap <strong>Follow</strong> on any list card in the global feed, or visit a creator's profile page and tap <strong>Follow</strong> there. The button changes to <strong>Following</strong> to confirm.</p>
+          <p>To unfollow, tap <strong>Following</strong> again.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Where can I see who I follow?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Go to your <strong>Profile</strong> tab and tap the <strong>Following</strong> count. This opens the list of creators you follow. Tap any name to visit their profile.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PROFILE                                                 -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="profile">
+      <div class="section-header">
+        <div class="section-icon">👤</div>
+        <h2>Your Profile</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I edit my profile?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Go to the <strong>Profile</strong> tab and tap <strong>Edit Profile</strong>. You can update your:</p>
+          <ul>
+            <li>Profile photo (chosen from your gallery)</li>
+            <li>Bio (up to 120 characters)</li>
+            <li>Header colour</li>
+            <li>Email address (if you registered with a phone)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Can I change my username?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Username changes are not currently supported. Your username is set when you create your account and is permanent. We may add this feature in a future update.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Who can see my profile?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Your profile page — username, avatar, bio, and published lists — is public and visible to all logged-in users. Your email address and phone number are <strong>private</strong> and never shown to other users.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- SETTINGS                                                -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="settings">
+      <div class="section-header">
+        <div class="section-icon">⚙️</div>
+        <h2>Settings</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I switch between dark and light mode?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Tap the sun/moon icon in the top-right corner of the app bar from any screen, or go to <strong>Settings → Appearance → Dark Mode</strong>. Your preference is saved automatically.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I delete my account?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Go to <strong>Settings → Delete Account</strong>, or visit <a href="support@listroh.com" target="_blank">listroh.app/delete-account</a>. Account deletion is permanent and removes all your lists, saves, and profile data.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I log out?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Open the sidebar menu (☰ top left) and tap <strong>Log Out</strong> at the bottom. You'll be taken back to the login screen.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PRIVACY                                                 -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="privacy">
+      <div class="section-header">
+        <div class="section-icon">🔒</div>
+        <h2>Privacy &amp; Data</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          Does Listroh show ads?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>No. Listroh does not display ads and does not sell your data to advertisers.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          What data does Listroh collect?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Listroh collects the minimum data needed to run the service:</p>
+          <ul>
+            <li>Username, email address or phone number</li>
+            <li>Profile photo (if you upload one)</li>
+            <li>Lists you create and publish</li>
+            <li>Lists you save and favorite</li>
+            <li>Users you follow</li>
+          </ul>
+          <p>We do not collect location data, contact lists, or any data from other apps. See our full <a href="support@listroh.com">Privacy Policy</a> for details.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          How do I report harmful content or a user?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Tap the <strong>⋯ menu</strong> on any list card or inside a list's detail page. Select <strong>Report list</strong> or <strong>Report user</strong>, choose a reason, and tap Submit. Our team reviews all reports promptly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- TROUBLESHOOTING                                         -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="troubleshooting">
+      <div class="section-header">
+        <div class="section-icon">🔧</div>
+        <h2>Common Issues</h2>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          The global feed is not loading. What should I do?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Check your internet connection first. If you're online but the feed still doesn't load, pull down on the screen to refresh. A cached version of the feed will show while offline so you can still browse previously loaded lists.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          I submitted my list but the status didn't change. Is it stuck?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>After tapping Submit, the list status changes to <strong>In Review</strong>. If you don't see this, close the app fully and reopen it — the status syncs automatically on launch. If it still shows Draft, check that you have a stable internet connection and try again.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          I didn't receive my SMS verification code.
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>SMS codes can occasionally be delayed by up to 60 seconds. If you still haven't received it:</p>
+          <ul>
+            <li>Make sure the phone number is in the correct international format (e.g. +91XXXXXXXXXX for India)</li>
+            <li>Tap <strong>Resend</strong> on the verification screen</li>
+            <li>Check you have good mobile signal — no signal means the SMS won't arrive</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          My profile photo isn't showing up. How do I fix it?
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>After uploading a new photo, close and reopen the app to clear the image cache. If the photo still doesn't appear, try uploading again — make sure the image is a standard JPEG or PNG and under 5MB.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggle(this)">
+          The app crashed or is behaving unexpectedly.
+          <span class="arrow">▾</span>
+        </button>
+        <div class="faq-a">
+          <p>Try these steps in order:</p>
+          <ol class="steps">
+            <li><span class="step-num">1</span>Close the app completely and reopen it.</li>
+            <li><span class="step-num">2</span>Check for an update in the Google Play Store.</li>
+            <li><span class="step-num">3</span>Restart your phone.</li>
+            <li><span class="step-num">4</span>If the issue persists, contact us at <a href="mailto:support@listroh.com">support@listroh.app</a> with a description of what happened.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- CONTACT                                                 -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="section" id="contact">
+      <div class="section-header">
+        <div class="section-icon">💬</div>
+        <h2>Contact Us</h2>
+      </div>
+
+      <p style="margin-bottom: 20px; color: var(--muted); font-size: 14px;">
+        Can't find what you're looking for? We're happy to help.
+      </p>
+
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="icon">📧</div>
+          <div class="title">General Support</div>
+          <div class="desc">
+            Questions about your account, lists, or anything else.<br><br>
+            <a href="mailto:support@listroh.com">support@listroh.com</a>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="icon">🛡️</div>
+          <div class="title">Safety &amp; Trust</div>
+          <div class="desc">
+            Report safety concerns, abuse, or CSAE-related issues.<br><br>
+            <a href="mailto:support@listroh.com">support@listroh.com</a>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="icon">⚖️</div>
+          <div class="title">Legal &amp; Privacy</div>
+          <div class="desc">
+            Data requests, privacy queries, legal correspondence.<br><br>
+            <a href="mailto:support@listroh.com">support@listroh.com</a>
+          </div>
+        </div>
+
+        <div class="contact-card">
+          <div class="icon">🗑️</div>
+          <div class="title">Delete My Account</div>
+          <div class="desc">
+            Request permanent account and data deletion.<br><br>
+            <a href="support@listroh.com">support@listroh.com</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div><!-- /layout -->
+
+<!-- ── FOOTER ──────────────────────────────────────────────────── -->
+<footer>
+  <span>&copy; 2026 Listroh &nbsp;·&nbsp; All rights reserved</span>
+  <span>
+    <a href="index.html">Home</a> &nbsp;·&nbsp;
+    <a href="privacy.html">Privacy Policy</a> &nbsp;·&nbsp;
+    <a href="terms.html">Terms of Service</a> &nbsp;·&nbsp;
+    <a href="csae.html">Child Safety</a>
+  </span>
+</footer>
+
+<!-- ── JAVASCRIPT ───────────────────────────────────────────────── -->
+<script>
+  // ── Accordion toggle ────────────────────────────────────────────
+  function toggle(btn) {
+    const answer = btn.nextElementSibling;
+    const isOpen = btn.classList.contains('open');
+
+    // Close all open items first
+    document.querySelectorAll('.faq-q.open').forEach(b => {
+      b.classList.remove('open');
+      b.nextElementSibling.classList.remove('open');
+    });
+
+    // Open this one if it wasn't already open
+    if (!isOpen) {
+      btn.classList.add('open');
+      answer.classList.add('open');
+    }
+  }
+
+  // ── FAQ Search ──────────────────────────────────────────────────
+  function filterFAQ(query) {
+    const q = query.toLowerCase().trim();
+    const items = document.querySelectorAll('.faq-item');
+    const sections = document.querySelectorAll('.section');
+
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+
+    // Hide section headers if all their items are hidden
+    sections.forEach(section => {
+      const visible = [...section.querySelectorAll('.faq-item')]
+        .some(i => i.style.display !== 'none');
+      section.style.display = (!q || visible) ? '' : 'none';
+    });
+  }
+
+  // ── Sidebar active link on scroll ───────────────────────────────
+  const sections = document.querySelectorAll('.section');
+  const links    = document.querySelectorAll('.sidebar a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        links.forEach(l => {
+          l.classList.toggle(
+            'active',
+            l.getAttribute('href') === '#' + id
+          );
+        });
+      }
+    });
+  }, { rootMargin: '0px 0px -60% 0px', threshold: 0 });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

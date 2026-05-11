@@ -303,3 +303,12 @@ body {
 .footer-sep {
   opacity: 0.4;
 }
+/* ── App store register button ── */
+#appStoreBtn:hover {
+  opacity: 0.85;
+}
+
+/* QR code box dark mode invert trick — keeps QR scannable on dark bg */
+[data-theme="dark"] #qrCodeBox {
+  filter: none; /* white bg already set inline */
+}
