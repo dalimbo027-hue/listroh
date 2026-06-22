@@ -15,6 +15,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
+app.set("trust proxy", 1); // Required on Render/Heroku — trust one proxy level for correct IP detection
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const CACHE_TTL = +(process.env.CACHE_TTL_SEC || 6 * 60 * 60); // seconds
