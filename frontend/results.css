@@ -430,3 +430,30 @@ html, body {
     justify-content: flex-end;
   }
 }
+
+
+
+
+/* ---------------------------------
+   ADS
+---------------------------------- */
+
+/* Left panel ad unit */
+.left-panel-ad {
+  margin: 4px 0 12px;
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 90px;
+  background: var(--glass);
+  border: 1px solid var(--panel-border);
+}
+
+/* Right panel ad unit */
+.right-panel-ad {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border);
+  min-height: 120px;
+  border-radius: 10px;
+  overflow: hidden;
+}

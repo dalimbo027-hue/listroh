@@ -117,7 +117,7 @@ async function fetchLists(reset = false) {
   const profileMap = {};
   (profilesRes.data || []).forEach(p => { profileMap[p.id] = p.username; });
 
-  data.forEach((list) => {
+  data.forEach((list, idx) => {
     const listItems    = itemsByList[list.id] || [];
     const previewItems = listItems.slice(0, 3);
     const owner        = profileMap[list.owner_id] || "Anonymous";
@@ -150,6 +150,24 @@ async function fetchLists(reset = false) {
     `;
 
     grid.appendChild(card);
+
+    // ── Inject ad card every 6th list card ──
+    if ((idx + 1) % 6 === 0) {
+      const adCard = document.createElement("div");
+      adCard.className = "explore-ad-card";
+      adCard.innerHTML = `
+        <span class="explore-ad-label">Sponsored</span>
+        <ins class="adsbygoogle"
+          style="display:block;min-height:200px;"
+          data-ad-client="ca-pub-3000381931465314"
+          data-ad-slot="9347885281"
+          data-ad-format="auto"
+          data-full-width-responsive="true">
+        </ins>
+      `;
+      grid.appendChild(adCard);
+      try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+    }
   });
 
   currentPage++;
@@ -173,7 +191,6 @@ function applyFilter() {
   currentFilter = searchInput.value.trim();
   fetchLists(true);
 }
-
 
 searchBtn.addEventListener("click", applyFilter);
 searchInput.addEventListener("keydown", (e) => {

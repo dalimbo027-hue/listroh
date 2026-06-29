@@ -215,6 +215,24 @@ function renderResults(data) {
     card.append(t, sub);
     titlesContainer.appendChild(card);
 
+    // ── Ad after every 4th card in the left panel ──
+    if ((index + 1) % 4 === 0) {
+      const adSlot = document.createElement("div");
+      adSlot.className = "left-panel-ad";
+      adSlot.innerHTML = `
+        <ins class="adsbygoogle"
+          style="display:block;min-height:90px;"
+          data-ad-client="ca-pub-3000381931465314"
+          data-ad-slot="5600211967"
+          data-ad-format="auto"
+          data-full-width-responsive="true">
+        </ins>
+      `;
+      titlesContainer.appendChild(adSlot);
+      // Push the ad unit
+      try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
+    }
+
     // ── Click → render items in right panel ──
     card.addEventListener("click", () => {
       document.querySelectorAll(".title-card").forEach(c => c.classList.remove("active"));
@@ -280,6 +298,21 @@ function renderSection(section) {
   sourceNote.className = "source-note";
   sourceNote.textContent = `Source: ${section.source}`;
   panel.appendChild(sourceNote);
+
+  // ── Ad below results ──
+  const rightAd = document.createElement("div");
+  rightAd.className = "right-panel-ad";
+  rightAd.innerHTML = `
+    <ins class="adsbygoogle"
+      style="display:block;min-height:120px;"
+      data-ad-client="ca-pub-3000381931465314"
+      data-ad-slot="7121598651"
+      data-ad-format="auto"
+      data-full-width-responsive="true">
+    </ins>
+  `;
+  panel.appendChild(rightAd);
+  try { (adsbygoogle = window.adsbygoogle || []).push({}); } catch(e) {}
 
   contentContainer.innerHTML = "";
   contentContainer.appendChild(panel);
