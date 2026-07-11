@@ -191,50 +191,6 @@ function renderList(list, items) {
   `;
   leftContainer.appendChild(meta);
 
-  // Item index — clicking scrolls right panel to that item
-  const indexLabel = document.createElement("p");
-  indexLabel.style.cssText = "font-size:0.78rem;color:var(--muted);margin:0 0 8px 4px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;";
-  indexLabel.textContent = "Items";
-  leftContainer.appendChild(indexLabel);
-
-  items.forEach(item => {
-    const indexCard = document.createElement("div");
-    indexCard.className = "title-card";
-    indexCard.style.cssText = "display:flex;align-items:center;gap:10px;padding:10px 12px;";
-    indexCard.dataset.rank = item.rank;
-
-    const rankBadge = document.createElement("div");
-    rankBadge.style.cssText = `
-      min-width:28px;height:28px;border-radius:7px;
-      background:var(--accent-2);display:grid;place-items:center;
-      font-weight:800;color:#fff;font-size:0.8rem;flex-shrink:0;
-    `;
-    rankBadge.textContent = item.rank;
-
-    const nameEl = document.createElement("span");
-    nameEl.style.cssText = "font-size:0.88rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;";
-    nameEl.textContent = item.content;
-
-    indexCard.append(rankBadge, nameEl);
-
-    // Click → scroll right panel to that item
-    indexCard.addEventListener("click", () => {
-      document.querySelectorAll(".left-panel .title-card").forEach(c => c.classList.remove("active"));
-      indexCard.classList.add("active");
-
-      const target = document.getElementById(`item-row-${item.rank}`);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "center" });
-        target.classList.add("item-highlight");
-        setTimeout(() => target.classList.remove("item-highlight"), 1200);
-      }
-
-      if (window.innerWidth <= 768) closeDrawer();
-    });
-
-    leftContainer.appendChild(indexCard);
-  });
-
   // ── RIGHT PANEL — ranked items ─────────────────────────────────────────────
   rightContainer.innerHTML = "";
 

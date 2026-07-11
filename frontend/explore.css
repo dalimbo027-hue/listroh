@@ -33,21 +33,25 @@
 }
 
 .sort-btn {
-  padding: 7px 14px;
-  border-radius: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
   border: 1px solid var(--panel-border);
   background: var(--glass);
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
   font-weight: 700;
   font-size: 0.85rem;
-  transition: background 0.2s, border-color 0.2s;
+  transition: all 0.18s ease;
 }
 
-.sort-btn.active,
 .sort-btn:hover {
-  background: var(--accent-2);
-  color: #fff;
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.sort-btn.active {
+  background: var(--accent);
+  color: #001;
   border-color: var(--accent);
 }
 
@@ -143,20 +147,56 @@
 }
 
 .load-more-btn {
-  padding: 12px 28px;
-  border-radius: 12px;
+  padding: 12px 32px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.load-more-btn:hover {
+  background: var(--accent);
+  color: #001;
+}
+
+/* Explore search bar button */
+.search-wrap.small button,
+#exploreSearchBtn {
+  padding: 9px 18px;
+  border: none;
+  background: var(--accent);
+  color: #001;
+  font-weight: 800;
+  cursor: pointer;
+  border-radius: 0 10px 10px 0;
+  transition: opacity 0.2s ease;
+}
+
+#exploreSearchBtn:hover { opacity: 0.88; }
+
+/* Explore header control buttons (theme, login/dashboard) */
+.controls button,
+.controls a {
+  padding: 8px 14px;
+  border-radius: 10px;
   border: 1px solid var(--panel-border);
   background: var(--glass);
   color: var(--text);
   cursor: pointer;
-  font-weight: 900;
-  transition: background 0.2s;
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: none;
+  transition: all 0.18s ease;
 }
 
-.load-more-btn:hover {
-  background: var(--accent-2);
-  color: #fff;
+.controls button:hover,
+.controls a:hover {
   border-color: var(--accent);
+  color: var(--accent);
 }
 
 .empty-state {
@@ -172,33 +212,4 @@
   .lists-grid {
     grid-template-columns: 1fr;
   }
-}
-
-/* ---------------------------------
-   ADS
----------------------------------- */
-
-/* Explore ad card — sits in the grid like a list card */
-.explore-ad-card {
-  background: var(--panel);
-  border: 1px solid var(--panel-border);
-  border-radius: 16px;
-  padding: 12px 14px;
-  box-shadow: var(--shadow);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 200px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* "Sponsored" label — top left, clearly visible but not intrusive */
-.explore-ad-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  opacity: 0.6;
 }

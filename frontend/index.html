@@ -13,7 +13,6 @@
     />
     <link rel="icon" href="/favicon.ico" />
     <title>Listroh: Search</title>
-    <meta name="google-adsense-account" content="ca-pub-3000381931465314">
     <link rel="stylesheet" href="styles.css" />
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png" />
@@ -29,7 +28,7 @@
     <div class="center-box">
       <a href="index.html" class="logo big-logo">Listroh</a>
       <p class="tag">
-        search for lists — “A dedicated engine for structured discovery.”
+        search for lists: “A dedicated engine for structured discovery.”
       </p>
 
       <div class="search-wrap">
@@ -48,6 +47,21 @@
         <button class="quick" data-q="books">books</button>
       </p>
     </div>
+
+    <!-- Descriptive content for visitors & search engines -->
+    <section class="home-about" style="max-width:720px;margin:20px auto 0;padding:0 22px;text-align:center;">
+      <p style="color:var(--muted);line-height:1.7;font-size:1rem;">
+        Listroh is a community driven platform for discovering and sharing curated
+        <strong style="color:var(--text);">Top 10 lists</strong>. Search any topic to see
+        structured, ranked recommendations or explore lists published by our community
+        across movies, music, sports, technology, food, travel, books, gaming, and more.
+        Every list is human reviewed before it goes live.
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px;">
+        <a href="explore.html" style="padding:11px 22px;border-radius:12px;background:var(--accent);color:#001;text-decoration:none;font-weight:700;font-size:0.95rem;">🌐 Explore Lists</a>
+        <a href="about.html" style="padding:11px 22px;border-radius:12px;border:1px solid var(--glass);background:var(--panel);color:var(--text);text-decoration:none;font-weight:700;font-size:0.95rem;">About Listroh</a>
+      </div>
+    </section>
 
     <!-- Auth Slide -->
     <div class="auth-overlay" id="authOverlay"></div>
@@ -71,55 +85,13 @@
           </button>
         </form>
 
-        <!-- Register via app view — shown when user clicks "Create one" -->
-        <div id="comingSoonView" style="display:none;flex-direction:column;align-items:center;gap:14px;padding:16px 0;text-align:center;">
-
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:1.6rem;">📱</span>
-            <div style="text-align:left;">
-              <h3 style="margin:0;font-size:1.05rem;font-weight:800;color:var(--text);">Register via our app</h3>
-              <p style="margin:2px 0 0;font-size:0.8rem;color:var(--muted);">Scan the QR code or tap the button below</p>
-            </div>
-          </div>
-
-          <!-- Static pre-generated QR code image -->
-          <img
-            src="listroh-qr.png"
-            alt="Scan to download Listroh on Google Play"
-            width="160"
-            height="160"
-            style="
-              border-radius:14px;
-              background:#fff;
-              padding:10px;
-              box-shadow:0 4px 20px rgba(0,0,0,0.3);
-              display:block;
-            "
-          />
-
-          <p style="margin:0;font-size:0.78rem;color:var(--muted);">
-            Scan with your phone camera to open Google Play
+        <!-- Coming soon view — shown instead of register form -->
+        <div id="comingSoonView" style="display:none;flex-direction:column;align-items:center;gap:16px;padding:24px 0;text-align:center;">
+          <p style="font-size:2.4rem;line-height:1;">🚀</p>
+          <h3 style="margin:0;font-size:1.2rem;font-weight:700;color:var(--text);">Coming Soon</h3>
+          <p style="margin:0;color:var(--muted);font-size:0.92rem;line-height:1.6;max-width:260px;">
+            Registration is not open yet. We'll let you know when it is.
           </p>
-
-          <!-- Direct link for mobile users already on their phone -->
-          <a
-            href="https://play.google.com/store/apps/details?id=com.listroh.listroh"
-            target="_blank"
-            rel="noopener"
-            style="
-              display:inline-flex;align-items:center;gap:8px;
-              padding:11px 22px;border-radius:12px;
-              background:var(--accent);color:#001;
-              text-decoration:none;font-weight:800;font-size:0.9rem;
-            "
-          >
-            ⬇️ Download on Google Play
-          </a>
-
-          <p style="margin:0;font-size:0.75rem;color:var(--muted);line-height:1.5;max-width:240px;">
-            Registration is available exclusively through the Listroh mobile app.
-          </p>
-
         </div>
 
         <p class="auth-switch" id="switchWrap">
@@ -134,17 +106,17 @@
     <script type="module" src="index.js"></script>
 
     <footer class="site-footer">
+      <a href="about.html">About</a>
+      <span class="footer-sep">·</span>
+      <a href="contact.html">Contact</a>
+      <span class="footer-sep">·</span>
       <a href="terms.html">Terms of Service</a>
       <span class="footer-sep">·</span>
       <a href="privacy.html">Privacy Policy</a>
       <span class="footer-sep">·</span>
       <a href="csae.html">CSAE</a>
       <span class="footer-sep">·</span>
-      <a href="help.html">Help</a>
-      <span class="footer-sep">·</span>
       <a href="delete.html">Delete Account</a>
-
-
     </footer>
   </body>
-</html>a
+</html>

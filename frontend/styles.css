@@ -1,6 +1,9 @@
 /* Theme variables */
 :root {
-  --bg: #0a0a0f;
+  --bg: radial-gradient(ellipse at 20% 15%, #12132a 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 10%, #0a2230 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, #1a0f24 0%, transparent 60%),
+        linear-gradient(160deg, #0a0a0f 0%, #0c0e18 100%);
   --panel: #11121a;
   --muted: #9aa0a6;
   --accent: #00fff7;
@@ -30,6 +33,9 @@ body {
   justify-content: center;
   align-items: center;
   background: var(--bg);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
   color: var(--text);
   font-family: Inter, system-ui, sans-serif;
 }
@@ -302,13 +308,4 @@ body {
 
 .footer-sep {
   opacity: 0.4;
-}
-/* ── App store register button ── */
-#appStoreBtn:hover {
-  opacity: 0.85;
-}
-
-/* QR code box dark mode invert trick — keeps QR scannable on dark bg */
-[data-theme="dark"] #qrCodeBox {
-  filter: none; /* white bg already set inline */
 }
