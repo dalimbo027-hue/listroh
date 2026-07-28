@@ -140,7 +140,17 @@ function loadDrafts() {
 }
 
 function saveDrafts(drafts) {
-  localStorage.setItem("listroh_regular_drafts", JSON.stringify(drafts));
+  try {
+    localStorage.setItem("listroh_regular_drafts", JSON.stringify(drafts));
+    const check = localStorage.getItem("listroh_regular_drafts");
+    if (!check) throw new Error("Storage did not persist.");
+    return true;
+  } catch (err) {
+    console.error("saveDrafts failed:", err);
+    throw new Error(
+      "Could not save draft. Browser storage may be disabled (private/incognito mode). " + err.message
+    );
+  }
 }
 
 function createLocalDraft(title, description, items) {
@@ -287,7 +297,7 @@ buildTop10Inputs();
 updateCreateUI();
 
 // ---------- READ TOP10 ITEMS ----------
-function getTop10Items() {
+function getTop10Items({ requireAll = true } = {}) {
   const inputs = document.querySelectorAll(".create-top10-input");
   const items = [];
 
@@ -298,11 +308,16 @@ function getTop10Items() {
     });
   });
 
-  if (items.some((x) => !x.content)) {
-    throw new Error("All 10 items must be filled.");
+  if (requireAll && items.some((x) => !x.content)) {
+    throw new Error("All 10 items must be filled to submit for review.");
   }
 
-  return items;
+  const filled = items.filter((x) => x.content);
+  if (filled.length < 1) {
+    throw new Error("Add at least 1 item before saving.");
+  }
+
+  return requireAll ? items : filled;
 }
 
 // ---------------- CREATE LIST HANDLER ----------------
@@ -336,7 +351,7 @@ async function createList(visibility) {
   }
 
   // ---------------- TOP10 = SUPABASE ----------------
-  const items = getTop10Items();
+  const items = getTop10Items({ requireAll: visibility === "PENDING" });
 
   const { data: newList, error: listError } = await supabase
     .from("lists")
@@ -372,9 +387,20 @@ document
   .addEventListener("submit", async (e) => {
     e.preventDefault();
 
+    const statusEl = document.getElementById("createStatus");
+    const saveBtn = e.target.querySelector('button[type="submit"]');
+    if (saveBtn) { saveBtn.disabled = true; saveBtn.textContent = "Saving…"; }
+    if (statusEl) statusEl.textContent = "";
+
     try {
       await createList("PRIVATE");
-      alert("Saved!");
+
+      if (statusEl) {
+        statusEl.textContent = "✅ Saved!";
+        statusEl.style.color = "var(--accent)";
+      } else {
+        alert("Saved!");
+      }
 
       document.getElementById("listTitle").value = "";
       document.getElementById("listDesc").value = "";
@@ -387,7 +413,16 @@ document
 
       renderMyLists();
     } catch (err) {
-      alert(err.message);
+      console.error("Save failed:", err);
+      const msg = err?.message || err?.hint || err?.details || err?.error_description || "Unknown error.";
+      if (statusEl) {
+        statusEl.textContent = "⚠️ " + msg;
+        statusEl.style.color = "#ff7070";
+      } else {
+        alert(msg);
+      }
+    } finally {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = "💾 Save"; }
     }
   });
 

@@ -14,12 +14,15 @@
 }
 
 :root[data-theme="light"] {
-  --bg: linear-gradient(180deg, #f7f8fa, #e8ebf0);
-  --panel: rgba(255,255,255,0.9);
+  --bg: radial-gradient(ellipse at 15% 15%, #ffe8f0 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 12%, #e3f0ff 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, #eee6ff 0%, transparent 55%),
+        linear-gradient(160deg, #fdfbff 0%, #eef2fb 100%);
+  --panel: rgba(255,255,255,0.82);
   --muted: #556170;
-  --accent: #0056ff;
-  --accent-2: #003ecb;
-  --text: #051124;
+  --accent: #7b3ff2;
+  --accent-2: #d63f8c;
+  --text: #1a1030;
   --glass: rgba(255,255,255,0.6);
   --shadow: 0 6px 22px rgba(19, 43, 76, 0.08);
 }

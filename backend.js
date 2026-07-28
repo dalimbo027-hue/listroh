@@ -9,13 +9,13 @@ import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
 import fetch, { AbortError } from "node-fetch";
+import { createClient } from "@supabase/supabase-js";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
-app.set("trust proxy", 1); // Required on Render/Heroku — trust one proxy level for correct IP detection
 
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 const CACHE_TTL = +(process.env.CACHE_TTL_SEC || 6 * 60 * 60); // seconds
@@ -83,6 +83,65 @@ function fetchWithTimeout(url, opts = {}, timeout = FETCH_TIMEOUT) {
 
 // caches
 const cache = new NodeCache({ stdTTL: CACHE_TTL, checkperiod: 120 });
+
+// Supabase server client — search our own published lists before hitting AI APIs
+let supabaseServer = null;
+if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  try {
+    supabaseServer = createClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY,
+    );
+  } catch (err) {
+    console.error("Could not init Supabase server client:", err.message);
+  }
+}
+
+// Search published community lists. Returns formatted sections or [] if none match.
+async function searchSupabaseLists(q) {
+  if (!supabaseServer) return [];
+  try {
+    const { data: lists, error } = await supabaseServer
+      .from("lists")
+      .select("id, title, description, tags")
+      .eq("visibility", "PUBLISHED")
+      .eq("type", "TOP10")
+      .or(`title.ilike.%${q}%,description.ilike.%${q}%`)
+      .limit(6);
+
+    if (error || !lists?.length) return [];
+
+    const ids = lists.map((l) => l.id);
+    const { data: items } = await supabaseServer
+      .from("list_items")
+      .select("list_id, rank, content")
+      .in("list_id", ids)
+      .order("rank", { ascending: true });
+
+    const itemsByList = {};
+    (items || []).forEach((it) => {
+      (itemsByList[it.list_id] ||= []).push(it);
+    });
+
+    return lists
+      .map((list) => {
+        const listItems = itemsByList[list.id] || [];
+        if (!listItems.length) return null;
+        return {
+          title: list.title,
+          items: listItems.map((it) => ({
+            name: it.content,
+            link: `/view-list.html?id=${list.id}`,
+          })),
+          source: "Listroh Community",
+        };
+      })
+      .filter(Boolean);
+  } catch (err) {
+    safeLog("Supabase search error:", err.message);
+    return [];
+  }
+}
 const winnerCache = new NodeCache({ stdTTL: WINNER_TTL, checkperiod: 300 });
 
 // middleware
@@ -160,43 +219,22 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve frontend files from the frontend/ subfolder
+// Serve frontend (assumes ../frontend)
 app.use(express.static(path.join(__dirname, "frontend"), { index: false }));
 app.get("/", (req, res) =>
   res.sendFile(path.join(__dirname, "frontend/index.html")),
 );
 
 // -------------------
-// Startup env var check — logs clearly on Render if vars are missing
-// -------------------
-(function checkEnvVars() {
-  const required = ["SUPABASE_URL", "SUPABASE_ANON_KEY"];
-  const missing  = required.filter(k => !process.env[k]);
-  if (missing.length) {
-    console.error(`❌ Missing environment variables: ${missing.join(", ")}`);
-    console.error("   Add them in Render → your service → Environment tab.");
-  } else {
-    safeLog("✅ Environment variables OK");
-  }
-})();
-
-// -------------------
 // Supabase config for frontend (public anon key)
 // Rate limited + cached so it isn't hammered on every page load
 // -------------------
 app.get("/config", limiter, (req, res) => {
-  const supabaseUrl     = process.env.SUPABASE_URL;
-  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    safeLog("❌ /config: SUPABASE_URL or SUPABASE_ANON_KEY not set");
-    return res.status(503).json({
-      error: "Server configuration incomplete. Set SUPABASE_URL and SUPABASE_ANON_KEY in your Render environment.",
-    });
-  }
-
   res.set("Cache-Control", "public, max-age=3600");
-  res.json({ supabaseUrl, supabaseAnonKey });
+  res.json({
+    supabaseUrl:     process.env.SUPABASE_URL,
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY,
+  });
 });
 /* -------------------
    Helpers: expandQuery (limited)
@@ -326,15 +364,19 @@ async function fetchFromGoogleBooks(query) {
 async function fetchFromGemini(query) {
   if (!GEMINI_API_KEY) return null;
   try {
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const prompt = [
+      `Give a numbered list of exactly 10 specific items for: "${query}"`,
+      "Return ONLY the names — one per line, numbered 1 to 10.",
+      "No intro, no descriptions, no extra words, no markdown, no parentheses.",
+      "Example format:\n1. First name\n2. Second name",
+    ].join("\n");
+
     const body = {
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `List 10 ${query}. Only numbered list.` }],
-        },
-      ],
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.4, maxOutputTokens: 400 },
     };
+
     const res = await fetchWithTimeout(
       url,
       {
@@ -342,19 +384,27 @@ async function fetchFromGemini(query) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       },
-      FETCH_TIMEOUT + 1000,
+      FETCH_TIMEOUT + 2000,
     );
     if (!res.ok) throw new Error(`Gemini ${res.status}`);
     const data = await res.json();
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
     const items = text
-      .split(/\r?\n|•|-/)
-      .map((l) => l.replace(/^\s*[\d\)\.\-]+/, "").trim())
-      .filter(Boolean)
+      .split(/\r?\n/)                       // split on newlines ONLY (keeps hyphenated names intact)
+      .map((l) => l
+        .replace(/^\s*\d+[\.\)]\s*/, "")    // strip "1. " / "1) "
+        .replace(/^\s*[•\-\*]\s*/, "")      // strip bullet markers at line start only
+        .replace(/\*\*/g, "")              // strip bold
+        .replace(/\s*\(.*?\)\s*/g, "")     // strip parentheticals
+        .trim()
+      )
+      .filter((l) => l.length > 1 && l.length < 120)
       .slice(0, 10)
       .map((name) => ({ name }));
-    if (items.length)
-      return { title: `Gemini: ${query}`, items, source: "Gemini" };
+
+    if (items.length >= 3)
+      return { title: query, items, source: "Gemini" };
   } catch (err) {
     safeLog("Gemini error:", err.message);
   }
@@ -372,15 +422,62 @@ async function fetchFromSerper(query) {
           "X-API-KEY": SERPER_API_KEY,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ q: query }),
+        body: JSON.stringify({ q: query, num: 10 }),
       },
       FETCH_TIMEOUT,
     );
     if (!res.ok) throw new Error(`Serper ${res.status}`);
     const data = await res.json();
+
+    // 1) answerBox often holds an actual list of names — best source
+    const boxList = data?.answerBox?.list || data?.answerBox?.items;
+    if (Array.isArray(boxList) && boxList.length >= 3) {
+      const items = boxList
+        .slice(0, 10)
+        .map((x) => ({ name: typeof x === "string" ? x : x?.title || x?.name }))
+        .filter((x) => x.name);
+      if (items.length >= 3) return { title: query, items, source: "Serper" };
+    }
+
+    // 2) answerBox snippet with newline-separated lines
+    const snippet = data?.answerBox?.snippet || data?.answerBox?.answer;
+    if (typeof snippet === "string") {
+      const lines = snippet
+        .split(/\r?\n/)
+        .map((l) => l.replace(/^\s*\d+[\.\)]\s*/, "").trim())
+        .filter((l) => l.length > 1 && l.length < 120);
+      if (lines.length >= 3) {
+        return { title: query, items: lines.slice(0, 10).map((name) => ({ name })), source: "Serper" };
+      }
+    }
+
+    // 3) knowledgeGraph list attributes
+    const kg = data?.knowledgeGraph?.attributes;
+    if (kg && typeof kg === "object") {
+      const vals = Object.values(kg).filter((v) => typeof v === "string");
+      if (vals.length >= 3) {
+        return { title: query, items: vals.slice(0, 10).map((name) => ({ name })), source: "Serper" };
+      }
+    }
+
+    // 4) relatedSearches — cleaner than page titles for "list" style queries
+    const related = (data?.relatedSearches || [])
+      .map((r) => (typeof r === "string" ? r : r?.query))
+      .filter(Boolean);
+    if (related.length >= 5) {
+      return { title: query, items: related.slice(0, 10).map((name) => ({ name })), source: "Serper" };
+    }
+
+    // 5) Last resort — organic page titles, but cleaned of site suffixes
     const items = (data?.organic || [])
       .slice(0, 10)
-      .map((r) => ({ name: r.title, link: r.link }));
+      .map((r) => ({
+        name: (r.title || "")
+          .replace(/\s*[-–|].*$/, "")   // strip " - IMDb", " | Rotten Tomatoes"
+          .trim(),
+        link: r.link,
+      }))
+      .filter((r) => r.name);
     if (items.length >= 3) return { title: query, items, source: "Serper" };
   } catch (err) {
     safeLog("Serper error:", err.message);
@@ -437,7 +534,8 @@ async function fetchFromJina(query) {
 
 async function fetchFromWikipedia(query) {
   try {
-    const url = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=10&format=json&origin=*`;
+    const term = query.replace(/top\s*\d+\s*/i, "").trim();
+    const url = `https://en.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(term)}&limit=10&format=json&origin=*`;
     const res = await fetchWithTimeout(url, { method: "GET" }, FETCH_TIMEOUT);
     if (!res.ok) throw new Error(`Wikipedia ${res.status}`);
     const data = await res.json();
@@ -445,8 +543,8 @@ async function fetchFromWikipedia(query) {
       name,
       link: data[3]?.[i] || null,
     }));
-    if (items.length)
-      return { title: `Wikipedia: ${query}`, items, source: "Wikipedia" };
+    if (items.length >= 3)
+      return { title: query, items, source: "Wikipedia" };
   } catch (err) {
     safeLog("Wikipedia error:", err.message);
   }
@@ -468,26 +566,25 @@ async function smartSearchForSubquery(
     ? [
         fetchFromGoogleBooks,
         fetchFromGemini,
+        fetchFromWikipedia,
         fetchFromSerper,
         fetchFromTavily,
-        fetchFromWikipedia,
-        fetchFromJina,
       ]
     : lower.includes("game")
       ? [
           fetchFromRAWG,
           fetchFromGemini,
+          fetchFromWikipedia,
           fetchFromSerper,
           fetchFromTavily,
-          fetchFromWikipedia,
-          fetchFromJina,
         ]
       : [
+          // Gemini returns clean names; Wikipedia as backup.
+          // Serper/Tavily only as last resort (they return web page titles).
           fetchFromGemini,
+          fetchFromWikipedia,
           fetchFromSerper,
           fetchFromTavily,
-          fetchFromWikipedia,
-          fetchFromJina,
         ];
 
   const tried = new Set();
@@ -578,6 +675,22 @@ app.get("/search", limiter, async (req, res) => {
 
     safeLog(`Search "${q}" from ${req.ip}`);
 
+    // ── STEP 1: Search our own published community lists first ──
+    const communityResults = await searchSupabaseLists(q);
+    if (communityResults.length) {
+      safeLog(`Supabase returned ${communityResults.length} community lists`);
+      const response = {
+        query: q,
+        normalizedQuery: normalized,
+        timestamp: Date.now(),
+        items: communityResults,
+        source: "listroh-community",
+      };
+      cache.set(normalized, response);
+      return res.json(response);
+    }
+
+    // ── STEP 2: Fall through to AI APIs if no community lists matched ──
     const subqueries = expandQuery(q);
     safeLog(`Expanded ${subqueries.length} subqueries`);
 
@@ -608,24 +721,15 @@ app.get("/search", limiter, async (req, res) => {
 
     for (const sq of subqueries) {
       safeLog(`Subquery "${sq}"`);
-      const { result, winnerFn } = await smartSearchForSubquery(
+      const { result } = await smartSearchForSubquery(
         sq,
         perRequestState,
-        true,
+        false, // don't use persisted winner — always try Gemini first for clean names
       );
       if (result) {
         results.push(result);
-        if (winnerFn && !winnerCache.get(`winner:${normalized}`)) {
-          try {
-            winnerCache.set(`winner:${normalized}`, winnerFn.name);
-            safeLog(`Persisted winner ${winnerFn.name} for "${normalized}"`);
-          } catch (err) {
-            safeLog("Could not persist winner:", err.message);
-          }
-        }
-      } else {
-        results.push(generateFallbackList(sq));
       }
+      // If no result, skip this subquery — no fake fallback data
     }
 
     const response = {
